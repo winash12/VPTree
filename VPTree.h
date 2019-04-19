@@ -23,9 +23,13 @@ class VPTree
   dist_func distance_function;
   const Geodesic& geod = Geodesic::WGS84();
 
+  bool _isLeaf();
+  
  public:
 
   VPTree(std::vector<Point> points,dist_func pfunc);
 
   double findMedian(std::vector<double>distances);
+
+  std::vector<Point> getAllInRange(Point query ,double maxDistance);
 };

@@ -84,9 +84,21 @@ VPTree::VPTree(vector<Point> points,dist_func pfunc)
     }
 }
 
+bool VPTree::_isLeaf()
+{
+  if (this->left == nullptr and this->left == nullptr)
+    {
+      return true;
+    }
+  else
+    {
+      return false;
+    }
+}
+
 double VPTree::findMedian(vector<double>distances) 
 { 
-
+  
   size_t size = distances.size();
   
   if (size == 0)
@@ -97,7 +109,7 @@ double VPTree::findMedian(vector<double>distances)
     {
   // First we sort the array 
       sort(distances.begin(),distances.end()); 
-
+      
       if (size % 2 == 0)
 	{
 	  return (distances[size/2 -1] + distances[size/2])/2;
@@ -108,5 +120,18 @@ double VPTree::findMedian(vector<double>distances)
 	} 
     }
 }
+  
+vector<Point> VPTree::getAllInRange(Point query, double maxDistance)
+{
+  vector<Point> neighbors;
+  vector<Point> nodes_to_visit;
+
+  while (nodes_to_visit.size() >0)
+    {
+      
+    }
+  return neighbors;
+}
+
 
   
