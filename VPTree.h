@@ -6,14 +6,10 @@
 #include <string.h>
 #include <boost/optional.hpp>
 #include <GeographicLib/Geodesic.hpp>
+#include "Point.h"
 
 using namespace GeographicLib;
 
-struct Point {
-  double _lat, _lon;
-
-
-};
 
 typedef double (*dist_func)(Point point1, Point point2);
 

@@ -34,10 +34,10 @@ VPTree::VPTree(vector<Point> points,dist_func pfunc)
   vector<double> distances;
   for (it = points.begin();it != points.end();++it)
     {
-      double lat = it->_lat;
-      double lon = it->_lon;
+      double lat = it->getCoordinate1();
+      double lon = it->getCoordinate2();
       double d;
-      this->geod.Inverse(vp._lat,vp._lon,lat,lon,d);
+      this->geod.Inverse(vp.getCoordinate1(),vp.getCoordinate2(),lat,lon,d);
       distances.push_back(d);
     }
   double median = findMedian(distances);
