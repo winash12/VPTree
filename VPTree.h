@@ -31,5 +31,5 @@ class VPTree
 
   double findMedian(std::vector<double>distances);
 
-  std::vector<Point> getAllInRange(Point query ,double maxDistance);
+  std::vector<std::pair<double,Point>> getAllInRange(Point query ,double maxDistance);
 };

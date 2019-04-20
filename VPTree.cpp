@@ -14,16 +14,16 @@ using std::vector;
 
 VPTree::VPTree(vector<Point> points,dist_func pfunc)
 {
-  this->left = nullptr;
-  this->right = nullptr;
+  left = nullptr;
+  right = nullptr;
   double inf = numeric_limits<double>::max();
-  this->left_min = inf;
-  this->left_max = 0;
-  this->right_min = inf;
-  this->right_max = 0;
-  this->distance_function = pfunc;
+  left_min = inf;
+  left_max = 0;
+  right_min = inf;
+  right_max = 0;
+  distance_function = pfunc;
 
-  this->vp = points.front();
+  vp = points.front();
   points.erase(points.begin()+0);
 
   if (points.size() == 0)
@@ -37,7 +37,7 @@ VPTree::VPTree(vector<Point> points,dist_func pfunc)
       double lat = it->getCoordinate1();
       double lon = it->getCoordinate2();
       double d;
-      this->geod.Inverse(vp.getCoordinate1(),vp.getCoordinate2(),lat,lon,d);
+      geod.Inverse(vp.getCoordinate1(),vp.getCoordinate2(),lat,lon,d);
       distances.push_back(d);
     }
   double median = findMedian(distances);
@@ -49,10 +49,10 @@ VPTree::VPTree(vector<Point> points,dist_func pfunc)
       boost::tie(point,distance) = tup;
       if (distance >= median)
 	{
-	  this->right_min = std::min(distance,this->right_min);
-	  if (distance > this->right_max)
+	  right_min = std::min(distance,right_min);
+	  if (distance > right_max)
 	    {
-	      this->right_max = distance;
+	      right_max = distance;
 	      right_points.at(0)= point;
 	    }
 	  else
@@ -62,10 +62,10 @@ VPTree::VPTree(vector<Point> points,dist_func pfunc)
 	}
       else
 	{
-	  this->left_min = min(distance,this->left_min);
-	  if (distance > this->left_max)
+	  left_min = min(distance,left_min);
+	  if (distance > left_max)
 	    {
-	      this->left_max = distance;
+	      left_max = distance;
 	      left_points.at(0) = point;
 	    }
 	  else
@@ -76,17 +76,17 @@ VPTree::VPTree(vector<Point> points,dist_func pfunc)
     }
   if (left_points.size() > 0)
     {
-      this->left = new VPTree(left_points,this->distance_function);
+      left = new VPTree(left_points,distance_function);
     }
   if (right_points.size() > 0)
     {
-      this->right = new VPTree(right_points,this->distance_function);
+      right = new VPTree(right_points,distance_function);
     }
 }
 
 bool VPTree::_isLeaf()
 {
-  if (this->left == nullptr and this->left == nullptr)
+  if (left == nullptr and right == nullptr)
     {
       return true;
     }
@@ -121,14 +121,16 @@ double VPTree::findMedian(vector<double>distances)
     }
 }
   
-vector<Point> VPTree::getAllInRange(Point query, double maxDistance)
+vector<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
 {
-  vector<Point> neighbors;
-  vector<Point> nodes_to_visit;
-
+  vector<pair<double,Point>> neighbors;
+  vector<pair<VPTree,double>> nodes_to_visit;
+  VPTree *node;
+  double d0;
+  nodes_to_visit.push_back(make_pair(*this,0));
   while (nodes_to_visit.size() >0)
     {
-      
+      //pair<*node,d0> = nodes_to_visit.back();
     }
   return neighbors;
 }
