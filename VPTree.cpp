@@ -124,14 +124,52 @@ double VPTree::findMedian(vector<double>distances)
 vector<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
 {
   vector<pair<double,Point>> neighbors;
-  vector<pair<VPTree,double>> nodes_to_visit;
-  VPTree *node;
+  vector<pair<VPTree*,double>> nodes_to_visit;
+  VPTree* node;
   double d0;
-  nodes_to_visit.push_back(make_pair(*this,0));
+  nodes_to_visit.push_back(make_pair(this,0));
   while (nodes_to_visit.size() >0)
     {
-      //pair<*node,d0> = nodes_to_visit.back();
-    }
+      auto it  = nodes_to_visit.end();
+      node = it->first;
+      d0 = it->second;
+      if (node == nullptr or d0 > maxDistance)
+	continue;
+    
+      double distance = distance_function(query,node->vp);
+      if (distance < maxDistance)
+	neighbors.push_back(make_pair(distance,node->vp));
+      
+      if (node->_isLeaf())
+	continue;
+      if (node->left_min <= distance && distance <= node->left_max)
+	{
+	  nodes_to_visit.insert(nodes_to_visit.begin(),make_pair(node->left,0));
+	}
+      else if (node->left_min-maxDistance <= distance && distance <= node->left_max + maxDistance )
+	{
+	  double dd;
+	  if (distance < node->left_min)
+	    dd = node->left_min - distance;
+	  else
+	    dd = distance - node->left_max;
+	  nodes_to_visit.push_back(make_pair(node->left,dd));
+	}
+      if (node->right_min <= distance && distance <= node->right_max)
+	{
+	  nodes_to_visit.insert(nodes_to_visit.begin(),make_pair(node->right,0));
+	}
+      else if (node->right_min-maxDistance <= distance && distance <= node->right_max + maxDistance )
+	{
+	  double dd;
+	  if (distance < node->right_min)
+	    dd = node->right_min - distance;
+	  else
+	    dd = distance - node->right_max;
+	  nodes_to_visit.push_back(make_pair(node->right,dd));
+	}
+      
+    }	     
   return neighbors;
 }
 
