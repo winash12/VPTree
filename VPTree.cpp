@@ -6,13 +6,14 @@
 #include <boost/optional.hpp>
 #include <boost/range/combine.hpp>
 #include <list>
+#include <typeinfo>
 #include "VPTree.h"
 
 using namespace std;
 using std::vector;
 
 
-VPTree::VPTree(vector<Point> points,dist_func pfunc)
+VPTree::VPTree(vector<Point> points,Distance pfunc)
 {
   left = nullptr;
   right = nullptr;
@@ -21,7 +22,7 @@ VPTree::VPTree(vector<Point> points,dist_func pfunc)
   left_max = 0;
   right_min = inf;
   right_max = 0;
-  distance_function = pfunc;
+  distance = pfunc;
 
   vp = points.front();
   points.erase(points.begin()+0);
@@ -34,13 +35,12 @@ VPTree::VPTree(vector<Point> points,dist_func pfunc)
   vector<double> distances;
   for (it = points.begin();it != points.end();++it)
     {
-      double lat = it->getCoordinate1();
-      double lon = it->getCoordinate2();
       double d;
-      geod.Inverse(vp.getCoordinate1(),vp.getCoordinate2(),lat,lon,d);
+      Point point = *it;
+      d = distance.calculateDistance(vp,point);
       distances.push_back(d);
     }
-  double median = findMedian(distances);
+  double median = _findMedian(distances);
   vector<Point> left_points,right_points;
   for (auto tup: boost::combine(points,distances))
     {
@@ -76,11 +76,11 @@ VPTree::VPTree(vector<Point> points,dist_func pfunc)
     }
   if (left_points.size() > 0)
     {
-      left = new VPTree(left_points,distance_function);
+      left = new VPTree(left_points,distance);
     }
   if (right_points.size() > 0)
     {
-      right = new VPTree(right_points,distance_function);
+      right = new VPTree(right_points,distance);
     }
 }
 
@@ -96,7 +96,7 @@ bool VPTree::_isLeaf()
     }
 }
 
-double VPTree::findMedian(vector<double>distances) 
+double VPTree::_findMedian(vector<double>distances) 
 { 
   
   size_t size = distances.size();
@@ -135,37 +135,38 @@ vector<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance
       d0 = it->second;
       if (node == nullptr or d0 > maxDistance)
 	continue;
-    
-      double distance = distance_function(query,node->vp);
-      if (distance < maxDistance)
-	neighbors.push_back(make_pair(distance,node->vp));
+      Point point = node->vp;
+
+      double dist = distance(query,point);
+      if (dist < maxDistance)
+	neighbors.push_back(make_pair(dist,node->vp));
       
       if (node->_isLeaf())
 	continue;
-      if (node->left_min <= distance && distance <= node->left_max)
+      if (node->left_min <= dist && dist <= node->left_max)
 	{
 	  nodes_to_visit.insert(nodes_to_visit.begin(),make_pair(node->left,0));
 	}
-      else if (node->left_min-maxDistance <= distance && distance <= node->left_max + maxDistance )
+      else if (node->left_min-maxDistance <= dist && dist <= node->left_max + maxDistance )
 	{
 	  double dd;
-	  if (distance < node->left_min)
-	    dd = node->left_min - distance;
+	  if (dist < node->left_min)
+	    dd = node->left_min - dist;
 	  else
-	    dd = distance - node->left_max;
+	    dd = dist - node->left_max;
 	  nodes_to_visit.push_back(make_pair(node->left,dd));
 	}
-      if (node->right_min <= distance && distance <= node->right_max)
+      if (node->right_min <= dist && dist <= node->right_max)
 	{
 	  nodes_to_visit.insert(nodes_to_visit.begin(),make_pair(node->right,0));
 	}
-      else if (node->right_min-maxDistance <= distance && distance <= node->right_max + maxDistance )
+      else if (node->right_min-maxDistance <= dist && dist <= node->right_max + maxDistance )
 	{
 	  double dd;
-	  if (distance < node->right_min)
-	    dd = node->right_min - distance;
+	  if (dist < node->right_min)
+	    dd = node->right_min - dist;
 	  else
-	    dd = distance - node->right_max;
+	    dd = dist - node->right_max;
 	  nodes_to_visit.push_back(make_pair(node->right,dd));
 	}
       
