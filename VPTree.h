@@ -11,7 +11,8 @@
 using namespace GeographicLib;
 
 
-typedef double (*dist_func)(Point point1, Point point2);
+typedef std::function<double(Point point1, Point point2)> dist_func;
+
 
 class VPTree
 {
