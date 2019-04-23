@@ -25,8 +25,8 @@ VPTree::VPTree(vector<Point> points,Distance pfunc)
   distance = pfunc;
 
   vp = points.front();
-  points.erase(points.begin()+0);
-
+  //points.erase(points.begin()+0);
+  points.pop_back();
   if (points.size() == 0)
     {
       return;
@@ -137,7 +137,7 @@ vector<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance
 	continue;
       Point point = node->vp;
 
-      double dist = distance(query,point);
+      double dist = distance.calculateDistance(query,point);
       if (dist < maxDistance)
 	neighbors.push_back(make_pair(dist,node->vp));
       
