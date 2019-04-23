@@ -1,15 +1,18 @@
+#include <memory>
 #include <GeographicLib/Geodesic.hpp>
 
 #include "Point.h"
 
 using namespace GeographicLib;
 
+using std::shared_ptr;
+
 class Distance
 {
  private:
   double distance;
  public:
-  double calculateDistance(Point point1, Point point2);
+  double calculateDistance(shared_ptr<Point> point1, shared_ptr<Point> point2);
 };
 
 

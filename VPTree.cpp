@@ -13,7 +13,7 @@ using namespace std;
 using std::vector;
 
 
-VPTree::VPTree(vector<Point> points,Distance pfunc)
+VPTree::VPTree(vector<shared_ptr<Point>> points,Distance pfunc)
 {
   left = nullptr;
   right = nullptr;
@@ -31,20 +31,20 @@ VPTree::VPTree(vector<Point> points,Distance pfunc)
     {
       return;
     }
-  vector<Point>::iterator it;
+  vector<shared_ptr<Point>>::iterator it;
   vector<double> distances;
   for (it = points.begin();it != points.end();++it)
     {
       double d;
-      Point point = *it;
+      shared_ptr<Point> point = *it;
       d = distance.calculateDistance(vp,point);
       distances.push_back(d);
     }
   double median = _findMedian(distances);
-  vector<Point> left_points,right_points;
+  vector<shared_ptr<Point>> left_points,right_points;
   for (auto tup: boost::combine(points,distances))
     {
-      Point point;
+      shared_ptr<Point> point;
       double distance;
       boost::tie(point,distance) = tup;
       if (distance >= median)
@@ -121,9 +121,9 @@ double VPTree::_findMedian(vector<double>distances)
     }
 }
   
-vector<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
+vector<pair<double,shared_ptr<Point>>> VPTree::getAllInRange(shared_ptr<Point> query, double maxDistance)
 {
-  vector<pair<double,Point>> neighbors;
+  vector<pair<double,shared_ptr<Point>>> neighbors;
   vector<pair<VPTree*,double>> nodes_to_visit;
   VPTree* node;
   double d0;
@@ -135,7 +135,7 @@ vector<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance
       d0 = it->second;
       if (node == nullptr or d0 > maxDistance)
 	continue;
-      Point point = node->vp;
+      shared_ptr<Point> point = node->vp;
 
       double dist = distance.calculateDistance(query,point);
       if (dist < maxDistance)

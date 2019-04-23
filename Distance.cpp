@@ -3,7 +3,7 @@
 
 using namespace GeographicLib;
 
-double Distance::calculateDistance(Point point1, Point point2)
+double Distance::calculateDistance(shared_ptr<Point> point1, shared_ptr<Point> point2)
 {
   return distance;
 }
