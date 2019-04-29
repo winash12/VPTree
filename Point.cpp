@@ -1,16 +1,24 @@
-class Point {
- private:
-  double coordinate1,coordinate2;
- public:
-  double  getCoordinate1();
-  double  getCoordinate2();
-};
+#include "Point.h"
 
-class SphericalPoint : public Point
+double SphericalPoint::getCoordinate1()
 {
- private:
-  double longitude,latitude;
- public:
-  double getCoordinate1();
-  double getCoordinate2();
-};
+  return latitude;
+}
+
+double SphericalPoint::getCoordinate2()
+{
+  return longitude;
+}
+
+
+void SphericalPoint::setCoordinate1(double lat)
+{
+  latitude = lat;
+}
+
+
+void SphericalPoint::setCoordinate2(double lon)
+{
+  longitude = lon;
+}
+

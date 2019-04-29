@@ -6,7 +6,7 @@ cdef extern from "VPTree.h":
     cdef cppclass VPTree:
        VPTree() except +
        vector[pair[double,shared_ptr[Point]]] getAllInRange(shared_ptr[Point]&,double maxDistance)
-       void initializeVPTreePoints(vector[shared_ptr[Point]])
+       void initializeVPTreePoints(vector[shared_ptr[Point]] *points)
        void initializeDistance(Distance *distance)
        
 cdef extern from "Distance.h" :
@@ -23,8 +23,12 @@ cdef extern from "Point.h":
        Point() except +
        double getCoordinate1()
        double getCoordinate2()
-
-    cdef cppclass SphericalPoint:
+       void setCoordinate1(double coordinate1)
+       void setCoordinate2(double coordinate2)
+       
+    cdef cppclass SphericalPoint(Point):
        SphericalPoint() except +
        double getCoordinate1()
        double getCoordinate2()
+       void setCoordinate1(double lat)
+       void setCoordinate2(double lon)
