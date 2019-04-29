@@ -12,6 +12,7 @@
 using std::unique_ptr;
 using std::shared_ptr;
 
+
 class VPTree
 {
  private:
@@ -19,7 +20,7 @@ class VPTree
   double left_min,right_min,left_max,right_max;
   shared_ptr<Point> vp;
   //Distance function
-  Distance distance;
+  Distance *distance;
 
   bool _isLeaf();
 
@@ -27,9 +28,11 @@ class VPTree
   
  public:
 
-  VPTree(std::vector<shared_ptr<Point>> points,Distance distance);
-
-
+  VPTree();
+  
+  void initializeVPTreePoints(std::vector<shared_ptr<Point>> points);
+  void initializeDistance(Distance *distance);
 
   std::vector<std::pair<double,shared_ptr<Point>>> getAllInRange(shared_ptr<Point> query ,double maxDistance);
 };
+

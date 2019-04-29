@@ -7,13 +7,19 @@
 #include <boost/range/combine.hpp>
 #include <list>
 #include <typeinfo>
+#include <memory>
 #include "VPTree.h"
 
 using namespace std;
 using std::vector;
 
 
-VPTree::VPTree(vector<shared_ptr<Point>> points,Distance pfunc)
+void VPTree::initializeDistance(Distance *pfunc)
+{
+  *distance = *pfunc;
+}
+
+void VPTree::initializeVPTreePoints(vector<shared_ptr<Point>> points)
 {
   left = nullptr;
   right = nullptr;
@@ -22,7 +28,7 @@ VPTree::VPTree(vector<shared_ptr<Point>> points,Distance pfunc)
   left_max = 0;
   right_min = inf;
   right_max = 0;
-  distance = pfunc;
+
 
   vp = points.front();
   //points.erase(points.begin()+0);
@@ -37,7 +43,7 @@ VPTree::VPTree(vector<shared_ptr<Point>> points,Distance pfunc)
     {
       double d;
       shared_ptr<Point> point = *it;
-      d = distance.calculateDistance(vp,point);
+      d = distance->calculateDistance(vp,point);
       distances.push_back(d);
     }
   double median = _findMedian(distances);
@@ -76,11 +82,16 @@ VPTree::VPTree(vector<shared_ptr<Point>> points,Distance pfunc)
     }
   if (left_points.size() > 0)
     {
-      left = new VPTree(left_points,distance);
+      left = new VPTree();
+      left->initializeDistance(distance);
+      left->initializeVPTreePoints(left_points);
+
     }
   if (right_points.size() > 0)
     {
-      right = new VPTree(right_points,distance);
+      right = new VPTree();
+      right->initializeDistance(distance);
+      right->initializeVPTreePoints(right_points);
     }
 }
 
@@ -137,7 +148,7 @@ vector<pair<double,shared_ptr<Point>>> VPTree::getAllInRange(shared_ptr<Point> q
 	continue;
       shared_ptr<Point> point = node->vp;
 
-      double dist = distance.calculateDistance(query,point);
+      double dist = distance->calculateDistance(query,point);
       if (dist < maxDistance)
 	neighbors.push_back(make_pair(dist,node->vp));
       

@@ -5,10 +5,10 @@ from libcpp.pair cimport pair
 cdef extern from "VPTree.h":
     cdef cppclass VPTree:
        VPTree() except +
-       VPTree(vector[shared_ptr[Point]],Distance distance) except +
        vector[pair[double,shared_ptr[Point]]] getAllInRange(shared_ptr[Point]&,double maxDistance)
-
-
+       void initializeVPTreePoints(vector[shared_ptr[Point]])
+       void initializeDistance(Distance *distance)
+       
 cdef extern from "Distance.h" :
     cdef cppclass Distance:
        Distance() except +
