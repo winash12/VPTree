@@ -5,6 +5,7 @@ from vptree cimport VPTree
 from vptree cimport Distance
 from vptree cimport Point
 
+import numpy as np
 cimport numpy as np
 
 from cython.operator cimport dereference
@@ -34,14 +35,24 @@ cdef class PyVPTree:
         self.gcd = new GreatCircleDistance()
         self.vptree.initializeDistance(self.gcd)
 
-    def getAllInRange(self,double latitude,double longitude,double maxDistance):
+    def getAllInRange(self,np.float64_t latitude,np.float64_t longitude, np.float64_t maxDistance):
         cdef shared_ptr[Point] point
         cdef vector[pair[double,shared_ptr[Point]]] vec
+
         point = shared_ptr[Point](new SphericalPoint())
         dereference(point).setCoordinate1(latitude)
         dereference(point).setCoordinate2(longitude)
         vec = self.vptree.getAllInRange(point,maxDistance)
-        
+        cdef vector[pair[double,shared_ptr[Point]]].iterator it = vec.begin()
+        result = []
+        while it != vec.end():
+            distance = dereference(it).first
+            p = dereference(it).second
+            lat = dereference(p).getCoordinate1()
+            lon = dereference(p).getCoordinate2()
+            p1 = np.append([lat,lon])
+            result.append(tuple((distance,p1)))
+        return result
         
     def __dealloc__(self):
         if self.vptree != NULL:
