@@ -38,6 +38,8 @@ cdef class PyVPTree:
         cdef shared_ptr[Point] point
         cdef vector[pair[double,shared_ptr[Point]]] vec
         point = shared_ptr[Point](new SphericalPoint())
+        dereference(point).setCoordinate1(latitude)
+        dereference(point).setCoordinate2(longitude)
         vec = self.vptree.getAllInRange(point,maxDistance)
         
         
