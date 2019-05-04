@@ -1,3 +1,6 @@
+#ifndef DISTANCE_H
+#define DISTANCE_H
+
 #include <memory>
 #include <GeographicLib/Geodesic.hpp>
 
@@ -6,6 +9,7 @@
 using namespace GeographicLib;
 
 using std::shared_ptr;
+
 
 class Distance
 {
@@ -26,3 +30,5 @@ class GreatCircleDistance : public Distance
   double calculateDistance(SphericalPoint point1,SphericalPoint point2);
 
 };
+
+#endif /* DISTANCE_H */

@@ -1,3 +1,6 @@
+#ifndef VPTREE_H
+#define VPTREE_H
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -36,3 +39,4 @@ class VPTree
   std::vector<std::pair<double,shared_ptr<Point>>> getAllInRange(shared_ptr<Point> query ,double maxDistance);
 };
 
+#endif /* VPTREE_H */
