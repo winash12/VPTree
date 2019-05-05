@@ -1,23 +1,31 @@
-#distutils : language = c++
-#distutils : sources = VPTree.cpp
+# distutils: language = c++
 
-from vptree cimport VPTree
-from vptree cimport Distance
-from vptree cimport Point
 
 import numpy as np
 cimport numpy as np
 
+from libcpp.memory cimport shared_ptr
+from libcpp.vector cimport vector
+from libcpp.pair cimport pair
+
+
 from cython.operator cimport dereference
+
+from vptree cimport VPTree
+from vptree cimport Distance
+from vptree cimport Point
+from vptree cimport SphericalPoint
+from vptree cimport GreatCircleDistance
+
 
 cdef class PyVPTree:
     cdef VPTree *vptree
     cdef Distance *gcd
-    cdef vector[shared_ptr[Point]]* points
+    cdef vector[shared_ptr[Point]] points
 
     def __cinit__(self):
         self.vptree = new VPTree()
-        self.points = new vector[shared_ptr[Point]]()
+        self.points = vector[shared_ptr[Point]]()
         
     def buildPointsVector(self,np.float64_t latitude,np.float64_t longitude):
 

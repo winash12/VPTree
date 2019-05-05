@@ -6,7 +6,7 @@ cdef extern from "VPTree.h":
     cdef cppclass VPTree:
        VPTree() except +
        vector[pair[double,shared_ptr[Point]]] getAllInRange(shared_ptr[Point]&,double maxDistance)
-       void initializeVPTreePoints(vector[shared_ptr[Point]] *points)
+       void initializeVPTreePoints(vector[shared_ptr[Point]] points)
        void initializeDistance(Distance *distance)
        
 cdef extern from "Distance.h" :
