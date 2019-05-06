@@ -22,3 +22,4 @@ void SphericalPoint::setCoordinate2(double lon)
   longitude = lon;
 }
 
+
