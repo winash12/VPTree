@@ -1,6 +1,3 @@
-#ifndef VPTREE_H
-#define VPTREE_H
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -19,7 +16,8 @@ using std::shared_ptr;
 class VPTree
 {
  private:
-  VPTree *left,*right;
+  shared_ptr<VPTree> left;
+  shared_ptr<VPTree> right;
   double left_min,right_min,left_max,right_max;
   shared_ptr<Point> vp;
   //Distance function
@@ -31,7 +29,7 @@ class VPTree
   
  public:
 
-  VPTree();
+  VPTree(){};
   
   void initializeVPTreePoints(std::vector<shared_ptr<Point>> points);
   void initializeDistance(Distance *distance);
@@ -39,4 +37,3 @@ class VPTree
   std::vector<std::pair<double,shared_ptr<Point>>> getAllInRange(shared_ptr<Point> query ,double maxDistance);
 };
 
-#endif /* VPTREE_H */

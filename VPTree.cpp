@@ -82,14 +82,14 @@ void VPTree::initializeVPTreePoints(vector<shared_ptr<Point>> points)
     }
   if (left_points.size() > 0)
     {
-      left = new VPTree();
+      left = std::make_shared<VPTree>();
       left->initializeDistance(distance);
       left->initializeVPTreePoints(left_points);
 
     }
   if (right_points.size() > 0)
     {
-      right = new VPTree();
+      right = std::make_shared<VPTree>();
       right->initializeDistance(distance);
       right->initializeVPTreePoints(right_points);
     }
@@ -135,10 +135,11 @@ double VPTree::_findMedian(vector<double>distances)
 vector<pair<double,shared_ptr<Point>>> VPTree::getAllInRange(shared_ptr<Point> query, double maxDistance)
 {
   vector<pair<double,shared_ptr<Point>>> neighbors;
-  vector<pair<VPTree*,double>> nodes_to_visit;
-  VPTree* node;
+  vector<pair<shared_ptr<VPTree>,double>> nodes_to_visit;
+  shared_ptr<VPTree> node;
   double d0;
-  nodes_to_visit.push_back(make_pair(this,0));
+  node = shared_ptr<VPTree>(this);
+  nodes_to_visit.push_back(make_pair(node,0));
   while (nodes_to_visit.size() >0)
     {
       auto it  = nodes_to_visit.end();
@@ -185,5 +186,8 @@ vector<pair<double,shared_ptr<Point>>> VPTree::getAllInRange(shared_ptr<Point> q
   return neighbors;
 }
 
-
+int main()
+{
+  return 0;
+}
   
