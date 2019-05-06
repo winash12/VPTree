@@ -1,3 +1,6 @@
+#ifndef DISTANCE_H
+#define DISTANCE_H
+
 #include <memory>
 #include <GeographicLib/Geodesic.hpp>
 
@@ -28,3 +31,4 @@ class GreatCircleDistance : public Distance
 
 };
 
+#endif /* DISTANCE_H */

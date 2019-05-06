@@ -1,3 +1,6 @@
+#ifndef POINT_H
+#define POINT_H
+
 class Point {
  private:
   double coordinate1,coordinate2;
@@ -19,3 +22,4 @@ class SphericalPoint : public Point
   void   setCoordinate2(double longitude);
 };
 
+#endif /* POINT_H */
