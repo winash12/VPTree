@@ -9,7 +9,7 @@ from Cython.Distutils import build_ext
 
 
 
-ext_modules = [Extension("test",
+ext_modules = [Extension("vptree",
                          ["vptree.pyx","Point.cpp","Distance.cpp","VPTree.cpp"],
                          include_dirs=['/usr/local/include/GeographicLib'],
                          extra_compile_args=["-std=c++17"],
@@ -18,7 +18,7 @@ ext_modules = [Extension("test",
                          language='c++',
                      )]
 setup(
-  name = 'test',
+  name = 'vptree',
   cmdclass = {'build_ext': build_ext},
   ext_modules = ext_modules
 )
