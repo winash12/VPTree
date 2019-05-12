@@ -3,9 +3,9 @@
 #include <limits>
 #include <fstream>
 #include <vector>
+#include <list>
 #include <boost/optional.hpp>
 #include <boost/range/combine.hpp>
-#include <list>
 #include <typeinfo>
 #include <memory>
 #include "VPTree.h"
@@ -16,7 +16,7 @@ using std::vector;
 
 void VPTree::initializeDistance(Distance *pfunc)
 {
-  *distance = *pfunc;
+  distance = pfunc;
 }
 
 void VPTree::initializeVPTreePoints(vector<shared_ptr<Point>> points)
@@ -51,14 +51,14 @@ void VPTree::initializeVPTreePoints(vector<shared_ptr<Point>> points)
   for (auto tup: boost::combine(points,distances))
     {
       shared_ptr<Point> point;
-      double distance;
-      boost::tie(point,distance) = tup;
-      if (distance >= median)
+      double dist;
+      boost::tie(point,dist) = tup;
+      if (dist >= median)
 	{
-	  right_min = std::min(distance,right_min);
-	  if (distance > right_max)
+	  right_min = std::min(dist,right_min);
+	  if (dist > right_max)
 	    {
-	      right_max = distance;
+	      right_max = dist;
 	      right_points.at(0)= point;
 	    }
 	  else
@@ -68,10 +68,10 @@ void VPTree::initializeVPTreePoints(vector<shared_ptr<Point>> points)
 	}
       else
 	{
-	  left_min = min(distance,left_min);
-	  if (distance > left_max)
+	  left_min = min(dist,left_min);
+	  if (dist > left_max)
 	    {
-	      left_max = distance;
+	      left_max = dist;
 	      left_points.at(0) = point;
 	    }
 	  else
@@ -140,7 +140,8 @@ vector<pair<double,shared_ptr<Point>>> VPTree::getAllInRange(shared_ptr<Point> q
   double d0;
   node = shared_ptr<VPTree>(this);
   nodes_to_visit.push_back(make_pair(node,0));
-  while (nodes_to_visit.size() >0)
+
+  while (nodes_to_visit.size() > 0 )
     {
       auto it  = nodes_to_visit.end();
       node = it->first;
@@ -188,6 +189,9 @@ vector<pair<double,shared_ptr<Point>>> VPTree::getAllInRange(shared_ptr<Point> q
 
 int main()
 {
+  VPTree vptree;
+  Distance *distance = new GreatCircleDistance();
+  vptree.initializeDistance(distance);
   return 0;
 }
   
