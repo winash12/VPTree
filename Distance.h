@@ -1,6 +1,9 @@
 #ifndef DISTANCE_H
 #define DISTANCE_H
 
+#define _USE_MATH_DEFINES
+
+#include <math.h>
 #include <memory>
 #include <GeographicLib/Geodesic.hpp>
 
@@ -24,9 +27,10 @@ class GreatCircleDistance : public Distance
 {
  private:
   double distance;
-  const Geodesic& geod = Geodesic::WGS84();
-  
+  //const Geodesic& geod = Geodesic::WGS84();
+  const Geodesic& geod = Geodesic(180./M_PI,0);
  public:
+  GreatCircleDistance(){};
   double calculateDistance(SphericalPoint point1,SphericalPoint point2);
 
 };
