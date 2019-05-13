@@ -1,9 +1,11 @@
+#cython: language_level=3, boundscheck=True
 # distutils: language = c++
-
+#
 
 import numpy as np
 cimport numpy as np
 
+from libc.stdio cimport printf
 from libcpp.memory cimport shared_ptr
 from libcpp.vector cimport vector
 from libcpp.pair cimport pair
@@ -26,14 +28,17 @@ cdef class PyVPTree:
     def __cinit__(self):
         self.vptree = new VPTree()
         self.points = vector[shared_ptr[Point]]()
+
         
-    def buildPointsVector(self,np.float64_t latitude,np.float64_t longitude):
+    def buildPointsVector(self,np.ndarray[np.float64_t,ndim=1] latitude ,np.ndarray[np.float64_t,ndim=1] longitude):
 
         cdef shared_ptr[Point] point
-        point = shared_ptr[Point](new SphericalPoint())
-        dereference(point).setCoordinate1(latitude)
-        dereference(point).setCoordinate2(longitude)
-        self.points.push_back(point)
+        for i in range(latitude.shape[0]):
+            for j in range(longitude.shape[0]):
+                point = shared_ptr[Point](new SphericalPoint())
+                dereference(point).setCoordinate1(latitude[i])
+                dereference(point).setCoordinate2(longitude[j])
+                self.points.push_back(point)
         
     cdef initializePoints(self):
         self.vptree.initializeVPTreePoints(self.points)
