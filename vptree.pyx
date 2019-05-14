@@ -6,7 +6,7 @@ import numpy as np
 cimport numpy as np
 
 from libc.stdio cimport printf
-from libcpp.memory cimport shared_ptr
+from libcpp.memory cimport shared_ptr,make_shared,dynamic_pointer_cast
 from libcpp.vector cimport vector
 from libcpp.pair cimport pair
 
@@ -33,9 +33,11 @@ cdef class PyVPTree:
     def buildPointsVector(self,np.ndarray[np.float64_t,ndim=1] latitude ,np.ndarray[np.float64_t,ndim=1] longitude):
 
         cdef shared_ptr[Point] point
+        cdef shared_ptr[SphericalPoint] sphericalPoint
         for i in range(latitude.shape[0]):
             for j in range(longitude.shape[0]):
-                point = shared_ptr[Point](new SphericalPoint())
+                sphericalPoint = make_shared[SphericalPoint]()
+                point = dynamic_pointer_cast[Point,SphericalPoint](sphericalPoint)
                 dereference(point).setCoordinate1(latitude[i])
                 dereference(point).setCoordinate2(longitude[j])
                 self.points.push_back(point)
