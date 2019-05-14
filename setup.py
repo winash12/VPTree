@@ -8,6 +8,10 @@ from Cython.Distutils import build_ext
 
 
 
+try:
+    shutil.rmtree("build")
+except OSError as e:
+     print ("Error: %s - %s." % (e.filename, e.strerror))
 
 ext_modules = [Extension("vptree",
                          ["vptree.pyx","Point.cpp","Distance.cpp","VPTree.cpp"],
