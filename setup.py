@@ -11,7 +11,7 @@ from Cython.Distutils import build_ext
 
 ext_modules = [Extension("vptree",
                          ["vptree.pyx","Point.cpp","Distance.cpp","VPTree.cpp"],
-                         include_dirs=['/usr/local/include/GeographicLib'],
+                         include_dirs=['/usr/local/include'],
                          extra_compile_args=["-O3","-std=c++17"],
                          extra_link_args=["-std=c++17"],
                          libraries=['Geographic'],
