@@ -47,7 +47,7 @@ void VPTree::initializeVPTreePoints(vector<shared_ptr<Point>> points)
 	  double d;
 	  shared_ptr<Point> point = *it;
 	  d = distance->calculateDistance(vp,point);
-	  //distances.push_back(d);
+	  distances.push_back(d);
 	}
     }
   catch (const std::out_of_range& oor)
