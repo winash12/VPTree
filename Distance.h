@@ -27,12 +27,10 @@ class GreatCircleDistance : public Distance
 {
  private:
   double distance;
-  //const Geodesic& geod = Geodesic::WGS84();
   const Geodesic& geod = Geodesic(180./M_PI,0);
  public:
   GreatCircleDistance(){};
-  double calculateDistance(SphericalPoint point1,SphericalPoint point2);
-
+  double calculateDistance(shared_ptr<Point> point1, shared_ptr<Point> point2);
 };
 
 #endif /* DISTANCE_H */

@@ -33,19 +33,28 @@ void VPTree::initializeVPTreePoints(vector<shared_ptr<Point>> points)
   vp = points.front();
   //points.erase(points.begin()+0);
   points.pop_back();
+  cout << "The size of points is " << points.size() << endl;
   if (points.size() == 0)
     {
       return;
     }
   vector<shared_ptr<Point>>::iterator it;
   vector<double> distances;
-  for (it = points.begin();it != points.end();++it)
+  try
     {
-      double d;
-      shared_ptr<Point> point = *it;
-      d = distance->calculateDistance(vp,point);
-      distances.push_back(d);
+      for (it = points.begin();it != points.end();++it)
+	{
+	  double d;
+	  shared_ptr<Point> point = *it;
+	  d = distance->calculateDistance(vp,point);
+	  //distances.push_back(d);
+	}
     }
+  catch (const std::out_of_range& oor)
+    {
+      std::cerr <<"Out of Range error: " << oor.what() << endl;
+    }
+  exit(0);
   double median = _findMedian(distances);
   vector<shared_ptr<Point>> left_points,right_points;
   for (auto tup: boost::combine(points,distances))
@@ -189,9 +198,6 @@ vector<pair<double,shared_ptr<Point>>> VPTree::getAllInRange(shared_ptr<Point> q
 
 int main()
 {
-  VPTree vptree;
-  Distance *distance = new GreatCircleDistance();
-  vptree.initializeDistance(distance);
   return 0;
 }
   
