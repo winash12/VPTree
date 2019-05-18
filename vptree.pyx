@@ -6,12 +6,13 @@ import numpy as np
 cimport numpy as np
 
 from libc.stdio cimport printf
-from libcpp.memory cimport shared_ptr,make_shared,dynamic_pointer_cast
+from libcpp.memory cimport shared_ptr,unique_ptr,make_shared,make_unique,dynamic_pointer_cast
 from libcpp.vector cimport vector
 from libcpp.pair cimport pair
 
 
 from cython.operator cimport dereference
+from cython.operator cimport postincrement as inc
 
 from vptree cimport VPTree
 from vptree cimport Distance
@@ -34,15 +35,17 @@ cdef class PyVPTree:
 
         cdef shared_ptr[Point] point
         cdef shared_ptr[SphericalPoint] sphericalPoint
-        for i in range(latitude.shape[0]):
-            for j in range(longitude.shape[0]):
+        cdef int ic,jc
+        for i in range(0,len(latitude)):
+            for j in range(0,len(longitude)):
                 sphericalPoint = make_shared[SphericalPoint]()
                 point = dynamic_pointer_cast[Point,SphericalPoint](sphericalPoint)
                 dereference(point).setCoordinate1(latitude[i])
                 dereference(point).setCoordinate2(longitude[j])
+                printf("%f\t%f\n",dereference(point).getCoordinate1(),dereference(point).getCoordinate2())
                 self.points.push_back(point)
-        
-    cdef initializePoints(self):
+            
+    def initializePoints(self):
         self.vptree.initializeVPTreePoints(self.points)
     
         
