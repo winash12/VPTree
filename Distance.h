@@ -16,18 +16,17 @@ using std::shared_ptr;
 
 class Distance
 {
- private:
+ protected:
   double distance;
  public:
-  double calculateDistance(shared_ptr<Point> point1, shared_ptr<Point> point2);
+  virtual double calculateDistance(shared_ptr<Point> point1, shared_ptr<Point> point2);
 };
 
 
 class GreatCircleDistance : public Distance
 {
  private:
-  double distance;
-  const Geodesic& geod = Geodesic(180./M_PI,0);
+  const Geodesic geod = Geodesic(180./M_PI,0);
  public:
   GreatCircleDistance(){};
   double calculateDistance(shared_ptr<Point> point1, shared_ptr<Point> point2);

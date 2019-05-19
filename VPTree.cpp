@@ -1,3 +1,4 @@
+#include <Python.h>
 #include <iostream>
 #include <exception>
 #include <limits>
@@ -31,8 +32,7 @@ void VPTree::initializeVPTreePoints(vector<shared_ptr<Point>> points)
 
 
   vp = points.front();
-  //points.erase(points.begin()+0);
-  points.pop_back();
+  points.erase(points.begin()+0);
   cout << "The size of points is " << points.size() << endl;
   if (points.size() == 0)
     {
