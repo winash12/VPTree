@@ -14,10 +14,10 @@ cdef extern from "VPTree.h":
 cdef extern from "Distance.h" :
     cdef cppclass Distance:
        Distance() except +
-       double calculateDistance(shared_ptr[Point]&,shared_ptr[Point]&)	
+       double calculateDistance(shared_ptr[Point],shared_ptr[Point])	
     cdef cppclass GreatCircleDistance(Distance):
        GreatCircleDistance() except +
-       double calculateDistance(shared_ptr[Point]&,shared_ptr[Point]&)
+       double calculateDistance(shared_ptr[Point],shared_ptr[Point])
 											
 
 cdef extern from "Point.h":

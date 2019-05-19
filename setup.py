@@ -5,7 +5,7 @@ import shutil
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
-
+from Cython.Build import cythonize
 
 
 try:
@@ -21,8 +21,10 @@ ext_modules = [Extension("vptree",
                          libraries=['Geographic'],
                          language='c++',
                      )]
+extensions = cythonize(ext_modules, language_level = "3")
+
 setup(
   name = 'vptree',
   cmdclass = {'build_ext': build_ext},
-  ext_modules = ext_modules
+  ext_modules = extensions
 )
