@@ -1,9 +1,8 @@
-#include <Python.h>
 #include <iostream>
 #include <exception>
 #include <limits>
 #include <fstream>
-#include <vector>
+#include <deque>
 #include <list>
 #include <boost/optional.hpp>
 #include <boost/range/combine.hpp>
@@ -13,14 +12,14 @@
 
 using namespace std;
 using std::vector;
-
+using std::deque;
 
 void VPTree::initializeDistance(Distance *pfunc)
 {
   distance = pfunc;
 }
 
-void VPTree::initializeVPTreePoints(vector<shared_ptr<Point>> points)
+void VPTree::initializeVPTreePoints(deque<shared_ptr<Point>> points)
 {
   left = nullptr;
   right = nullptr;
@@ -32,13 +31,14 @@ void VPTree::initializeVPTreePoints(vector<shared_ptr<Point>> points)
 
 
   vp = points.front();
-  points.erase(points.begin()+0);
+  //points.erase(points.begin()+0);
+  points.pop_front();
   cout << "The size of points is " << points.size() << endl;
   if (points.size() == 0)
     {
       return;
     }
-  vector<shared_ptr<Point>>::iterator it;
+  deque<shared_ptr<Point>>::iterator it;
   vector<double> distances;
   try
     {
@@ -56,7 +56,7 @@ void VPTree::initializeVPTreePoints(vector<shared_ptr<Point>> points)
     }
   exit(0);
   double median = _findMedian(distances);
-  vector<shared_ptr<Point>> left_points,right_points;
+  deque<shared_ptr<Point>> left_points,right_points;
   for (auto tup: boost::combine(points,distances))
     {
       shared_ptr<Point> point;

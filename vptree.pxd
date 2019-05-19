@@ -1,12 +1,14 @@
 from libcpp.memory cimport shared_ptr
 from libcpp.vector cimport vector
+from libcpp.deque cimport deque
 from libcpp.pair cimport pair
+
 
 cdef extern from "VPTree.h":
     cdef cppclass VPTree:
        VPTree() except +
        vector[pair[double,shared_ptr[Point]]] getAllInRange(shared_ptr[Point]&,double maxDistance)
-       void initializeVPTreePoints(vector[shared_ptr[Point]] points)
+       void initializeVPTreePoints(deque[shared_ptr[Point]] points)
        void initializeDistance(Distance *distance)
        
 cdef extern from "Distance.h" :
@@ -15,7 +17,7 @@ cdef extern from "Distance.h" :
        double calculateDistance(shared_ptr[Point]&,shared_ptr[Point]&)	
     cdef cppclass GreatCircleDistance(Distance):
        GreatCircleDistance() except +
-       double calculateDistance(SphericalPoint point1, SphericalPoint2)
+       double calculateDistance(shared_ptr[Point]&,shared_ptr[Point]&)
 											
 
 cdef extern from "Point.h":

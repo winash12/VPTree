@@ -8,6 +8,7 @@ cimport numpy as np
 from libc.stdio cimport printf
 from libcpp.memory cimport shared_ptr,unique_ptr,make_shared,make_unique,dynamic_pointer_cast
 from libcpp.vector cimport vector
+from libcpp.deque cimport deque
 from libcpp.pair cimport pair
 
 
@@ -24,11 +25,11 @@ from vptree cimport GreatCircleDistance
 cdef class PyVPTree:
     cdef VPTree *vptree
     cdef Distance *gcd
-    cdef vector[shared_ptr[Point]] points
+    cdef deque[shared_ptr[Point]] points
 
     def __cinit__(self):
         self.vptree = new VPTree()
-        self.points = vector[shared_ptr[Point]]()
+        self.points = deque[shared_ptr[Point]]()
 
         
     def buildPointsVector(self,np.ndarray[np.float64_t,ndim=1] latitude ,np.ndarray[np.float64_t,ndim=1] longitude):
@@ -42,8 +43,8 @@ cdef class PyVPTree:
                 point = dynamic_pointer_cast[Point,SphericalPoint](sphericalPoint)
                 dereference(point).setCoordinate1(latitude[i])
                 dereference(point).setCoordinate2(longitude[j])
-                printf("%f\t%f\n",dereference(point).getCoordinate1(),dereference(point).getCoordinate2())
-                self.points.push_back(point)
+                #printf("%f\t%f\n",dereference(point).getCoordinate1(),dereference(point).getCoordinate2())
+                self.points.push_front(point)
             
     def initializePoints(self):
         self.vptree.initializeVPTreePoints(self.points)

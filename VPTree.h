@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <vector>
+#include <deque>
 #include <string.h>
 #include <memory>
 #include <boost/optional.hpp>
@@ -33,7 +33,7 @@ class VPTree
 
   VPTree(){};
   
-  void initializeVPTreePoints(std::vector<shared_ptr<Point>> points);
+  void initializeVPTreePoints(std::deque<shared_ptr<Point>> points);
   void initializeDistance(Distance *distance);
 
   std::vector<std::pair<double,shared_ptr<Point>>> getAllInRange(shared_ptr<Point> query ,double maxDistance);
