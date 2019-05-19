@@ -31,7 +31,6 @@ void VPTree::initializeVPTreePoints(deque<shared_ptr<Point>> points)
 
 
   vp = points.front();
-  //points.erase(points.begin()+0);
   points.pop_front();
   cout << "The size of points is " << points.size() << endl;
   if (points.size() == 0)
@@ -39,7 +38,7 @@ void VPTree::initializeVPTreePoints(deque<shared_ptr<Point>> points)
       return;
     }
   deque<shared_ptr<Point>>::iterator it;
-  vector<double> distances;
+  deque<double> distances;
   try
     {
       for (it = points.begin();it != points.end();++it)
@@ -47,7 +46,7 @@ void VPTree::initializeVPTreePoints(deque<shared_ptr<Point>> points)
 	  double d;
 	  shared_ptr<Point> point = *it;
 	  d = distance->calculateDistance(vp,point);
-	  distances.push_back(d);
+	  distances.push_front(d);
 	}
     }
   catch (const std::out_of_range& oor)
@@ -116,7 +115,7 @@ bool VPTree::_isLeaf()
     }
 }
 
-double VPTree::_findMedian(vector<double>distances) 
+double VPTree::_findMedian(deque<double>distances) 
 { 
   
   size_t size = distances.size();

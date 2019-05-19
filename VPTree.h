@@ -27,7 +27,7 @@ class VPTree
 
   bool _isLeaf();
 
-  double _findMedian(std::vector<double>distances);
+  double _findMedian(std::deque<double>distances);
   
  public:
 
