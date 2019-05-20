@@ -1,4 +1,3 @@
-#cython: language_level=3, boundscheck=True
 # distutils: language = c++
 #
 
@@ -55,10 +54,12 @@ cdef class PyVPTree:
         self.vptree.initializeDistance(self.gcd)
 
     def getAllInRange(self,np.float64_t latitude,np.float64_t longitude, np.float64_t maxDistance):
-        cdef shared_ptr[Point] point
         cdef vector[pair[double,shared_ptr[Point]]] vec
+        cdef shared_ptr[Point] point
+        cdef shared_ptr[SphericalPoint] sphericalPoint
 
-        point = shared_ptr[Point](new SphericalPoint())
+        sphericalPoint = make_shared[SphericalPoint]()
+        point = dynamic_pointer_cast[Point,SphericalPoint](sphericalPoint)
         dereference(point).setCoordinate1(latitude)
         dereference(point).setCoordinate2(longitude)
         vec = self.vptree.getAllInRange(point,maxDistance)
