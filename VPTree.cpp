@@ -32,7 +32,7 @@ void VPTree::initializeVPTreePoints(deque<shared_ptr<Point>> points)
 
   vp = points.front();
   points.pop_front();
-  cout << "The size of points is " << points.size() << endl;
+
   if (points.size() == 0)
     {
       return;
@@ -52,42 +52,50 @@ void VPTree::initializeVPTreePoints(deque<shared_ptr<Point>> points)
   catch (const std::out_of_range& oor)
     {
       std::cerr <<"Out of Range error: " << oor.what() << endl;
+      exit(0);
     }
-  exit(0);
   double median = _findMedian(distances);
   deque<shared_ptr<Point>> left_points,right_points;
-  for (auto tup: boost::combine(points,distances))
+  try
     {
-      shared_ptr<Point> point;
-      double dist;
-      boost::tie(point,dist) = tup;
-      if (dist >= median)
+      for (auto tup: boost::combine(points,distances))
 	{
-	  right_min = std::min(dist,right_min);
-	  if (dist > right_max)
+	  shared_ptr<Point> point;
+	  double dist;
+	  boost::tie(point,dist) = tup;
+	  if (dist >= median)
 	    {
-	      right_max = dist;
-	      right_points.at(0)= point;
+	      right_min = std::min(dist,right_min);
+	      if (dist > right_max)
+		{
+		  right_max = dist;
+		  right_points.push_front(point);
+		}
+	      else
+		{
+		  right_points.push_back(point);
+		}
 	    }
 	  else
 	    {
-	      right_points.push_back(point);
-	    }
-	}
-      else
-	{
-	  left_min = min(dist,left_min);
-	  if (dist > left_max)
-	    {
-	      left_max = dist;
-	      left_points.at(0) = point;
-	    }
-	  else
-	    {
-	      left_points.push_back(point);
+	      left_min = min(dist,left_min);
+	      if (dist > left_max)
+		{
+		  left_max = dist;
+		  left_points.push_front(point);
+		}
+	      else
+		{
+		  left_points.push_back(point);
+		}
 	    }
 	}
     }
+  catch (const std::out_of_range& oor)
+    {
+      std::cerr <<"Out of Range error: " << oor.what() << endl;
+    }
+
   if (left_points.size() > 0)
     {
       left = std::make_shared<VPTree>();

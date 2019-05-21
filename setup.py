@@ -9,7 +9,12 @@ from Cython.Build import cythonize
 
 
 try:
-    shutil.rmtree("build")
+    if os.path.exists("vptree.cpp"):
+        os.remove("vptree.cpp")
+    if os.path.exists("vptree.cpython-36m-x86_64-linux-gnu.so"):
+        os.remove("vptree.cpython-36m-x86_64-linux-gnu.so")
+    if os.path.exists("build"):
+        shutil.rmtree("build")
 except OSError as e:
      print ("Error: %s - %s." % (e.filename, e.strerror))
 
