@@ -18,10 +18,12 @@ try:
 except OSError as e:
      print ("Error: %s - %s." % (e.filename, e.strerror))
 
+os.environ['CFLAGS'] = '-O3 -Wall -std=c++17'
+     
 ext_modules = [Extension("vptree",
                          ["vptree.pyx","Point.cpp","Distance.cpp","VPTree.cpp"],
                          include_dirs=['/usr/local/include'],
-                         extra_compile_args=["-O3","-std=c++17"],
+                         #extra_compile_args=["-O3","-std=c++17"],
                          extra_link_args=["-std=c++17"],
                          libraries=['Geographic'],
                          language='c++',

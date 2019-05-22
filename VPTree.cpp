@@ -16,10 +16,10 @@ using std::deque;
 
 void VPTree::initializeDistance(Distance *pfunc)
 {
-  distance = pfunc;
+  this->distance = pfunc;
 }
 
-void VPTree::initializeVPTreePoints(deque<shared_ptr<Point>> points)
+void VPTree::initializeVPTreePoints(deque<Point> points)
 {
   left = nullptr;
   right = nullptr;
@@ -37,15 +37,15 @@ void VPTree::initializeVPTreePoints(deque<shared_ptr<Point>> points)
     {
       return;
     }
-  deque<shared_ptr<Point>>::iterator it;
+  deque<Point>::iterator it;
   deque<double> distances;
   try
     {
       for (it = points.begin();it != points.end();++it)
 	{
 	  double d;
-	  shared_ptr<Point> point = *it;
-	  d = distance->calculateDistance(vp,point);
+	  Point point = *it;
+	  d = this->distance->calculateDistance(vp,point);
 	  distances.push_front(d);
 	}
     }
@@ -55,12 +55,14 @@ void VPTree::initializeVPTreePoints(deque<shared_ptr<Point>> points)
       exit(0);
     }
   double median = _findMedian(distances);
-  deque<shared_ptr<Point>> left_points,right_points;
+  cout << "The value of median is " << median << endl;
+  exit(0);
+  deque<Point> left_points,right_points;
   try
     {
       for (auto tup: boost::combine(points,distances))
 	{
-	  shared_ptr<Point> point;
+	  Point point;
 	  double dist;
 	  boost::tie(point,dist) = tup;
 	  if (dist >= median)
@@ -95,19 +97,19 @@ void VPTree::initializeVPTreePoints(deque<shared_ptr<Point>> points)
     {
       std::cerr <<"Out of Range error: " << oor.what() << endl;
     }
-
+  exit(0);
   if (left_points.size() > 0)
     {
-      left = std::make_shared<VPTree>();
-      left->initializeDistance(distance);
-      left->initializeVPTreePoints(left_points);
+      this->left = new VPTree();
+      this->left->initializeDistance(this->distance);
+      this->left->initializeVPTreePoints(left_points);
 
     }
   if (right_points.size() > 0)
     {
-      right = std::make_shared<VPTree>();
-      right->initializeDistance(distance);
-      right->initializeVPTreePoints(right_points);
+      this->right = new VPTree();
+      this->right->initializeDistance(this->distance);
+      this->right->initializeVPTreePoints(right_points);
     }
 }
 
@@ -126,7 +128,7 @@ bool VPTree::_isLeaf()
 double VPTree::_findMedian(deque<double>distances) 
 { 
   
-  size_t size = distances.size();
+  /*size_t size = distances.size();
   
   if (size == 0)
     {
@@ -135,7 +137,7 @@ double VPTree::_findMedian(deque<double>distances)
   else
     {
   // First we sort the array 
-      sort(distances.begin(),distances.end()); 
+      qsort(distances.begin(),distances.end()); 
       
       if (size % 2 == 0)
 	{
@@ -145,16 +147,19 @@ double VPTree::_findMedian(deque<double>distances)
 	{
 	  return distances[size/2];
 	} 
-    }
+	}*/
+  size_t n = distances.size()/2;
+  nth_element(distances.begin(),distances.begin()+n,distances.end());
+  return distances[n];  
 }
   
-vector<pair<double,shared_ptr<Point>>> VPTree::getAllInRange(shared_ptr<Point> query, double maxDistance)
+vector<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
 {
-  vector<pair<double,shared_ptr<Point>>> neighbors;
-  vector<pair<shared_ptr<VPTree>,double>> nodes_to_visit;
-  shared_ptr<VPTree> node;
+  vector<pair<double,Point>> neighbors;
+  vector<pair<VPTree*,double>> nodes_to_visit;
+  VPTree *node;
   double d0;
-  node = shared_ptr<VPTree>(this);
+  node = this;
   nodes_to_visit.push_back(make_pair(node,0));
 
   while (nodes_to_visit.size() > 0 )
@@ -164,7 +169,7 @@ vector<pair<double,shared_ptr<Point>>> VPTree::getAllInRange(shared_ptr<Point> q
       d0 = it->second;
       if (node == nullptr or d0 > maxDistance)
 	continue;
-      shared_ptr<Point> point = node->vp;
+      Point point = node->vp;
 
       double dist = distance->calculateDistance(query,point);
       if (dist < maxDistance)

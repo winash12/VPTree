@@ -18,10 +18,11 @@ using std::shared_ptr;
 class VPTree
 {
  private:
-  shared_ptr<VPTree> left;
-  shared_ptr<VPTree> right;
+
+  VPTree *left;
+  VPTree *right;
   double left_min,right_min,left_max,right_max;
-  shared_ptr<Point> vp;
+  Point vp;
   //Distance function
   Distance *distance;
 
@@ -33,9 +34,9 @@ class VPTree
 
   VPTree(){};
   
-  void initializeVPTreePoints(std::deque<shared_ptr<Point>> points);
+  void initializeVPTreePoints(std::deque<Point> points);
   void initializeDistance(Distance *distance);
 
-  std::vector<std::pair<double,shared_ptr<Point>>> getAllInRange(shared_ptr<Point> query ,double maxDistance);
+  std::vector<std::pair<double,Point>> getAllInRange(Point query ,double maxDistance);
 };
 #endif /* VPTREE_H */

@@ -4,19 +4,19 @@
 using namespace std;
 using namespace GeographicLib;
 
-double Distance::calculateDistance(shared_ptr<Point> point1, shared_ptr<Point> point2)
+double Distance::calculateDistance(Point point1, Point point2)
 {
   return distance;
 }
 
-double GreatCircleDistance::calculateDistance(shared_ptr<Point> point1,shared_ptr<Point> point2)
+double GreatCircleDistance::calculateDistance(Point point1,Point point2)
 {
-  double lat2 = point2->getCoordinate1();
-  double lon2 = point2->getCoordinate2();
+  double lat2 = point2.getCoordinate1();
+  double lon2 = point2.getCoordinate2();
   //cout << "The value of lat is " << lat2 << endl;
   //cout << "The value of lon is " << lon2 << endl;
-  double lat1 = point1->getCoordinate1();
-  double lon1 =  point1->getCoordinate2();
+  double lat1 = point1.getCoordinate1();
+  double lon1 =  point1.getCoordinate2();
   //cout << "The value of lat is " << lat1 << endl;
   //cout << "The value of lon is " << lon1 << endl;
 
@@ -24,5 +24,7 @@ double GreatCircleDistance::calculateDistance(shared_ptr<Point> point1,shared_pt
   //cout << "The value of distance is " << distance << endl;
   if (!(distance >= 0))
     throw GeographicErr("distance does not satisfy d >= 0");
+  double Re = 6371.;
+  distance = Re * M_PI * distance/180.;
   return distance;
 }

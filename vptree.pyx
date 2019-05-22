@@ -24,25 +24,23 @@ from vptree cimport GreatCircleDistance
 cdef class PyVPTree:
     cdef VPTree *vptree
     cdef Distance *gcd
-    cdef deque[shared_ptr[Point]] points
+    cdef deque[Point] points
 
     def __cinit__(self):
         self.vptree = new VPTree()
-        self.points = deque[shared_ptr[Point]]()
+        self.points = deque[Point]()
 
         
     def buildPointsVector(self,np.ndarray[np.float64_t,ndim=1] latitude ,np.ndarray[np.float64_t,ndim=1] longitude):
 
-        cdef shared_ptr[Point] point
-        cdef shared_ptr[SphericalPoint] sphericalPoint
-        cdef int ic,jc
+        cdef SphericalPoint spoint
+        cdef Point point
         for i in range(0,len(latitude)):
             for j in range(0,len(longitude)):
-                sphericalPoint = make_shared[SphericalPoint]()
-                point = dynamic_pointer_cast[Point,SphericalPoint](sphericalPoint)
-                dereference(point).setCoordinate1(latitude[i])
-                dereference(point).setCoordinate2(longitude[j])
-                #printf("%f\t%f\n",dereference(point).getCoordinate1(),dereference(point).getCoordinate2())
+                spoint = SphericalPoint()
+                point = spoint
+                point.setCoordinate1(latitude[i])
+                point.setCoordinate2(longitude[j])
                 self.points.push_front(point)
             
     def initializePoints(self):
@@ -54,22 +52,21 @@ cdef class PyVPTree:
         self.vptree.initializeDistance(self.gcd)
 
     def getAllInRange(self,np.float64_t latitude,np.float64_t longitude, np.float64_t maxDistance):
-        cdef vector[pair[double,shared_ptr[Point]]] vec
-        cdef shared_ptr[Point] point
-        cdef shared_ptr[SphericalPoint] sphericalPoint
-
-        sphericalPoint = make_shared[SphericalPoint]()
-        point = dynamic_pointer_cast[Point,SphericalPoint](sphericalPoint)
-        dereference(point).setCoordinate1(latitude)
-        dereference(point).setCoordinate2(longitude)
+        cdef vector[pair[double,Point]] vec
+        cdef SphericalPoint spoint
+        cdef Point point
+        spoint = SphericalPoint()
+        point = spoint
+        point.setCoordinate1(latitude)
+        point.setCoordinate2(longitude)
         vec = self.vptree.getAllInRange(point,maxDistance)
-        cdef vector[pair[double,shared_ptr[Point]]].iterator it = vec.begin()
+        cdef vector[pair[double,Point]].iterator it = vec.begin()
         result = []
         while it != vec.end():
             distance = dereference(it).first
             p = dereference(it).second
-            lat = dereference(p).getCoordinate1()
-            lon = dereference(p).getCoordinate2()
+            lat = p.getCoordinate1()
+            lon = p.getCoordinate2()
             p1 = np.append([lat,lon])
             result.append(tuple((distance,p1)))
         return result
