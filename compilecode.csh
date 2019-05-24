@@ -1,3 +1,3 @@
-g++ -Wall -std=c++17 -I/usr/local/include -c -g   *.cpp
+clang++ -Wall -std=c++17 -O3 -march=native -Ofast -ftree-vectorize -I/usr/local/include -c -g   *.cpp
 
-g++ -o coo *.o -l Geographic 
+clang++ -o coo *.o -l Geographic
