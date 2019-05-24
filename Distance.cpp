@@ -4,12 +4,13 @@
 using namespace std;
 using namespace GeographicLib;
 
-double Distance::calculateDistance(Point point1, Point point2)
+double Distance::calculateDistance(const Point& point1, const Point& point2)
 {
   return distance;
 }
 
-double GreatCircleDistance::calculateDistance(Point point1,Point point2)
+
+double GreatCircleDistance::calculateDistance(const Point& point1,const Point& point2)
 {
   double lat2 = point2.getCoordinate1();
   double lon2 = point2.getCoordinate2();

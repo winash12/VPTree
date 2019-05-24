@@ -17,7 +17,7 @@ class Distance
  protected:
   double distance;
  public:
-  virtual double calculateDistance(Point point1, Point point2);
+  virtual double calculateDistance(const Point& point1, const Point& point2);
 };
 
 
@@ -27,7 +27,7 @@ class GreatCircleDistance : public Distance
   const Geodesic geod = Geodesic(180./M_PI,0);
  public:
   GreatCircleDistance(){};
-  double calculateDistance(Point point1, Point point2);
+  double calculateDistance(const Point& point1, const Point& point2);
 };
 
 #endif /* DISTANCE_H */

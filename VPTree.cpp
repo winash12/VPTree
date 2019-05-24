@@ -1,3 +1,4 @@
+#include <time.h>
 #include <iostream>
 #include <exception>
 #include <limits>
@@ -16,11 +17,12 @@ using std::deque;
 
 void VPTree::initializeDistance(Distance *pfunc)
 {
-  this->distance = pfunc;
+  distance = pfunc;
 }
 
 void VPTree::initializeVPTreePoints(deque<Point> points)
 {
+  time_t start,end;
   left = nullptr;
   right = nullptr;
   double inf = numeric_limits<double>::max();
@@ -29,7 +31,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
   right_min = inf;
   right_max = 0;
 
-
+  time(&start);
   vp = points.front();
   points.pop_front();
 
@@ -45,7 +47,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 	{
 	  double d;
 	  Point point = *it;
-	  d = this->distance->calculateDistance(vp,point);
+	  d = distance->calculateDistance(vp,point);
 	  distances.push_front(d);
 	}
     }
@@ -55,7 +57,10 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
       exit(0);
     }
   double median = _findMedian(distances);
-  cout << "The value of median is " << median << endl;
+  time(&end);
+  double diff = difftime(end,start);
+  cout << "The value of diff is " << diff << endl;
+  //cout << "The value of median is " << median << endl;
   exit(0);
   deque<Point> left_points,right_points;
   try
@@ -164,9 +169,9 @@ vector<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance
 
   while (nodes_to_visit.size() > 0 )
     {
-      auto it  = nodes_to_visit.end();
-      node = it->first;
-      d0 = it->second;
+      auto it  = nodes_to_visit.front();
+      node = it.first;
+      d0 = it.second;
       if (node == nullptr or d0 > maxDistance)
 	continue;
       Point point = node->vp;
@@ -208,8 +213,4 @@ vector<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance
   return neighbors;
 }
 
-int main()
-{
-  return 0;
-}
   
