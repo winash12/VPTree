@@ -23,40 +23,38 @@ from vptree cimport GreatCircleDistance
 
 cdef class PyVPTree:
     cdef VPTree *vptree
-    cdef Distance *gcd
     cdef deque[Point] points
-
+    cdef Distance *gcd
+    
     def __cinit__(self):
         self.vptree = new VPTree()
         self.points = deque[Point]()
 
+    def initializeGreatCircleDistance(self):
+
+        self.gcd = new GreatCircleDistance()
+        self.vptree.initializeDistance(self.gcd)
         
-    def buildPointsVector(self,np.ndarray[np.float64_t,ndim=1] latitude ,np.ndarray[np.float64_t,ndim=1] longitude):
+    def buildPointsVector(self,np.ndarray[np.float64_t,ndim=2] points):
 
         cdef SphericalPoint spoint
         cdef Point point
-        for i in range(0,len(latitude)):
-            for j in range(0,len(longitude)):
-                spoint = SphericalPoint()
-                point = spoint
-                point.setCoordinate1(latitude[i])
-                point.setCoordinate2(longitude[j])
-                self.points.push_front(point)
-            
+        for i in range(0,len(points)):
+            spoint = SphericalPoint()
+            point = <Point>spoint
+            point.setCoordinate1(points[i,0])
+            point.setCoordinate2(points[i,1])
+            self.points.push_front(point)
+
     def initializePoints(self):
         self.vptree.initializeVPTreePoints(self.points)
-    
-        
-    def initializeGreatCircleDistance(self):
-        self.gcd = new GreatCircleDistance()
-        self.vptree.initializeDistance(self.gcd)
 
     def getAllInRange(self,np.float64_t latitude,np.float64_t longitude, np.float64_t maxDistance):
         cdef vector[pair[double,Point]] vec
         cdef SphericalPoint spoint
         cdef Point point
         spoint = SphericalPoint()
-        point = spoint
+        point = <Point>spoint
         point.setCoordinate1(latitude)
         point.setCoordinate2(longitude)
         vec = self.vptree.getAllInRange(point,maxDistance)
