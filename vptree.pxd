@@ -7,7 +7,7 @@ from libcpp.pair cimport pair
 cdef extern from "VPTree.h":
     cdef cppclass VPTree:
        VPTree() except +
-       vector[pair[double,Point]] getAllInRange(Point point,double maxDistance)
+       deque[pair[double,Point]] getAllInRange(Point point,double maxDistance)
        void initializeVPTreePoints(deque[Point] points)
        void initializeDistance(Distance *distance)
        

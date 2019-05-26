@@ -37,6 +37,6 @@ class VPTree
   void initializeVPTreePoints(std::deque<Point> points);
   void initializeDistance(Distance *distance);
 
-  std::vector<std::pair<double,Point>> getAllInRange(Point query ,double maxDistance);
+  std::deque<std::pair<double,Point>> getAllInRange(Point query ,double maxDistance);
 };
 #endif /* VPTREE_H */

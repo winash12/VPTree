@@ -44,23 +44,24 @@ cdef class PyVPTree:
             point = <Point>spoint
             point.setCoordinate1(points[i,0])
             point.setCoordinate2(points[i,1])
+            printf("%f\t%f\n",point.getCoordinate1(),point.getCoordinate2())
             self.points.push_front(point)
 
     def initializePoints(self):
         self.vptree.initializeVPTreePoints(self.points)
 
-    def getAllInRange(self,np.float64_t latitude,np.float64_t longitude, np.float64_t maxDistance):
-        cdef vector[pair[double,Point]] vec
+    def getAllInRange(self,np.ndarray[np.float64_t,ndim=2] qpoint, np.float64_t maxDistance):
+        cdef deque[pair[double,Point]] deq
         cdef SphericalPoint spoint
         cdef Point point
         spoint = SphericalPoint()
         point = <Point>spoint
-        point.setCoordinate1(latitude)
-        point.setCoordinate2(longitude)
-        vec = self.vptree.getAllInRange(point,maxDistance)
-        cdef vector[pair[double,Point]].iterator it = vec.begin()
+        point.setCoordinate1(qpoint[0])
+        point.setCoordinate2(qpoint[1])
+        deq = self.vptree.getAllInRange(point,maxDistance)
+        cdef deque[pair[double,Point]].iterator it = deq.begin()
         result = []
-        while it != vec.end():
+        while it != deq.end():
             distance = dereference(it).first
             p = dereference(it).second
             lat = p.getCoordinate1()

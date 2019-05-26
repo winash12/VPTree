@@ -60,8 +60,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
   time(&end);
   double diff = difftime(end,start);
   cout << "The value of diff is " << diff << endl;
-  //cout << "The value of median is " << median << endl;
-  exit(0);
+  cout << "The value of median is " << median << endl;
   deque<Point> left_points,right_points;
   try
     {
@@ -102,7 +101,6 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
     {
       std::cerr <<"Out of Range error: " << oor.what() << endl;
     }
-  exit(0);
   if (left_points.size() > 0)
     {
       this->left = new VPTree();
@@ -158,14 +156,14 @@ double VPTree::_findMedian(deque<double>distances)
   return distances[n];  
 }
   
-vector<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
+deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
 {
-  vector<pair<double,Point>> neighbors;
-  vector<pair<VPTree*,double>> nodes_to_visit;
+  deque<pair<double,Point>> neighbors;
+  deque<pair<VPTree*,double>> nodes_to_visit;
   VPTree *node;
   double d0;
   node = this;
-  nodes_to_visit.push_back(make_pair(node,0));
+  nodes_to_visit.push_front(make_pair(node,0));
 
   while (nodes_to_visit.size() > 0 )
     {
