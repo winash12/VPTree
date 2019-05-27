@@ -50,6 +50,14 @@ cdef class PyVPTree:
     def initializePoints(self):
         self.vptree.initializeVPTreePoints(self.points)
 
+    def getNeighborsInRange(self,np.ndarray[np.float64_t,ndim=2] gridPoints,np.float64_t maxDistance):
+        accumulatedResult = []
+        for i in range(0,len(gridPoints)):
+            result = []
+            result = self.getAllInRange(gridPoints[i],maxDistance)
+            accumulatedResult.append(result)
+        return accumulatedResult
+
     def getAllInRange(self,np.ndarray[np.float64_t,ndim=2] qpoint, np.float64_t maxDistance):
         cdef deque[pair[double,Point]] deq
         cdef SphericalPoint spoint
