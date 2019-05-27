@@ -44,7 +44,7 @@ cdef class PyVPTree:
             point = <Point>spoint
             point.setCoordinate1(points[i,0])
             point.setCoordinate2(points[i,1])
-            printf("%f\t%f\n",point.getCoordinate1(),point.getCoordinate2())
+            #printf("%f\t%f\n",point.getCoordinate1(),point.getCoordinate2())
             self.points.push_front(point)
 
     def initializePoints(self):
@@ -54,11 +54,11 @@ cdef class PyVPTree:
         accumulatedResult = []
         for i in range(0,len(gridPoints)):
             result = []
-            result = self.getAllInRange(gridPoints[i],maxDistance)
+            result = self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
             accumulatedResult.append(result)
         return accumulatedResult
 
-    def getAllInRange(self,np.ndarray[np.float64_t,ndim=2] qpoint, np.float64_t maxDistance):
+    def getNeighborsInRangeForSingleQueryPoint(self,np.ndarray[np.float64_t,ndim=2] qpoint, np.float64_t maxDistance):
         cdef deque[pair[double,Point]] deq
         cdef SphericalPoint spoint
         cdef Point point
