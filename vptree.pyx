@@ -57,6 +57,7 @@ cdef class PyVPTree:
         for i in range(0,len(gridPoints)):
             result = []
             result = self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
+            print(result)
             accumulatedResult.append(result)
         t1 = time.time()
         print(t1-t0)
@@ -71,6 +72,7 @@ cdef class PyVPTree:
         point.setCoordinate1(qpoint[0])
         point.setCoordinate2(qpoint[1])
         deq = self.vptree.getAllInRange(point,maxDistance)
+
         cdef deque[pair[double,Point]].iterator it = deq.begin()
         result = []
         while it != deq.end():
@@ -79,6 +81,7 @@ cdef class PyVPTree:
             lat = p.getCoordinate1()
             lon = p.getCoordinate2()
             p1 = np.c_[lat,lon]
+            inc(it)
             result.append(tuple((distance,p1)))
         return result
         
