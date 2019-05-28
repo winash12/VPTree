@@ -1,6 +1,7 @@
 # distutils: language = c++
 #
-
+import sys
+import time
 import numpy as np
 cimport numpy as np
 
@@ -52,13 +53,16 @@ cdef class PyVPTree:
 
     def getNeighborsInRange(self,np.ndarray[np.float64_t,ndim=2] gridPoints,np.float64_t maxDistance):
         accumulatedResult = []
+        t0 = time.time()
         for i in range(0,len(gridPoints)):
             result = []
             result = self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
             accumulatedResult.append(result)
+        t1 = time.time()
+        print(t1-t0)
         return accumulatedResult
 
-    def getNeighborsInRangeForSingleQueryPoint(self,np.ndarray[np.float64_t,ndim=2] qpoint, np.float64_t maxDistance):
+    def getNeighborsInRangeForSingleQueryPoint(self,np.ndarray[np.float64_t,ndim=1] qpoint, np.float64_t maxDistance):
         cdef deque[pair[double,Point]] deq
         cdef SphericalPoint spoint
         cdef Point point
@@ -74,7 +78,7 @@ cdef class PyVPTree:
             p = dereference(it).second
             lat = p.getCoordinate1()
             lon = p.getCoordinate2()
-            p1 = np.append([lat,lon])
+            p1 = np.c_[lat,lon]
             result.append(tuple((distance,p1)))
         return result
         

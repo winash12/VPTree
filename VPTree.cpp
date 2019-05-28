@@ -58,9 +58,9 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
     }
   double median = _findMedian(distances);
   time(&end);
-  double diff = difftime(end,start);
-  cout << "The value of diff is " << diff << endl;
-  cout << "The value of median is " << median << endl;
+  //double diff = difftime(end,start);
+  //cout << "The value of diff is " << diff << endl;
+  //cout << "The value of median is " << median << endl;
   deque<Point> left_points,right_points;
   try
     {
@@ -162,29 +162,28 @@ deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
   deque<pair<VPTree*,double>> nodes_to_visit;
   VPTree *node;
   double d0;
-  node = this;
-  nodes_to_visit.push_front(make_pair(node,0));
-
+  nodes_to_visit.push_front(make_pair(this,0));
   while (nodes_to_visit.size() > 0 )
     {
-      auto it  = nodes_to_visit.front();
-      node = it.first;
-      d0 = it.second;
+      deque<pair<VPTree*,double>>::iterator it = nodes_to_visit.begin();
+      node = it->first;
+      d0 = it->second;
+      nodes_to_visit.pop_front();
       if (node == nullptr or d0 > maxDistance)
 	continue;
       Point point = node->vp;
 
       double dist = distance->calculateDistance(query,point);
       if (dist < maxDistance)
-	neighbors.push_back(make_pair(dist,node->vp));
+	neighbors.push_back(make_pair(dist,point));
       
       if (node->_isLeaf())
 	continue;
       if (node->left_min <= dist && dist <= node->left_max)
 	{
-	  nodes_to_visit.insert(nodes_to_visit.begin(),make_pair(node->left,0));
+	  nodes_to_visit.push_front(make_pair(node->left,0));
 	}
-      else if (node->left_min-maxDistance <= dist && dist <= node->left_max + maxDistance )
+      else if (node->left_min-maxDistance <= dist && dist <= (node->left_max + maxDistance) )
 	{
 	  double dd;
 	  if (dist < node->left_min)
@@ -195,7 +194,7 @@ deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
 	}
       if (node->right_min <= dist && dist <= node->right_max)
 	{
-	  nodes_to_visit.insert(nodes_to_visit.begin(),make_pair(node->right,0));
+	  nodes_to_visit.push_front(make_pair(node->right,0));
 	}
       else if (node->right_min-maxDistance <= dist && dist <= node->right_max + maxDistance )
 	{
@@ -206,7 +205,6 @@ deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
 	    dd = dist - node->right_max;
 	  nodes_to_visit.push_back(make_pair(node->right,dd));
 	}
-      
     }	     
   return neighbors;
 }
