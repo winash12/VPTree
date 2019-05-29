@@ -5,6 +5,12 @@ import time
 import numpy as np
 cimport numpy as np
 
+cimport cython
+
+from multiprocessing import cpu_count
+import threading
+
+
 from libc.stdio cimport printf
 from libcpp.memory cimport shared_ptr,unique_ptr,make_shared,make_unique,dynamic_pointer_cast
 from libcpp.vector cimport vector
@@ -26,11 +32,12 @@ cdef class PyVPTree:
     cdef VPTree *vptree
     cdef deque[Point] points
     cdef Distance *gcd
-    
+    cdef int number_of_processors
+
     def __cinit__(self):
         self.vptree = new VPTree()
         self.points = deque[Point]()
-
+        self.number_of_processors = cpu_count()
     def initializeGreatCircleDistance(self):
 
         self.gcd = new GreatCircleDistance()
@@ -57,7 +64,8 @@ cdef class PyVPTree:
         for i in range(0,len(gridPoints)):
             result = []
             result = self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
-            print(result)
+            if result:
+                print(result)
             accumulatedResult.append(result)
         t1 = time.time()
         print(t1-t0)
