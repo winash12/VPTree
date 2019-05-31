@@ -7,6 +7,8 @@
 #include <list>
 #include <boost/optional.hpp>
 #include <boost/range/combine.hpp>
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics.hpp>
 #include <typeinfo>
 #include <memory>
 #include "VPTree.h"
@@ -14,6 +16,7 @@
 using namespace std;
 using std::vector;
 using std::deque;
+using namespace boost::accumulators;
 
 void VPTree::initializeDistance(Distance *pfunc)
 {
@@ -48,6 +51,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 	  double d;
 	  Point point = *it;
 	  d = distance->calculateDistance(vp,point);
+	  cout <<"The value of d is " << d << endl;
 	  distances.push_front(d);
 	}
     }
@@ -56,6 +60,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
       std::cerr <<"Out of Range error: " << oor.what() << endl;
       exit(0);
     }
+  exit(0);
   double median = _findMedian(distances);
   time(&end);
   //double diff = difftime(end,start);
@@ -84,7 +89,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 	    }
 	  else
 	    {
-	      left_min = min(dist,left_min);
+	      left_min = std::min(dist,left_min);
 	      if (dist > left_max)
 		{
 		  left_max = dist;
@@ -118,7 +123,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 
 bool VPTree::_isLeaf()
 {
-  if (left == nullptr and right == nullptr)
+  if (!(left)  and !(right))
     {
       return true;
     }
@@ -129,9 +134,13 @@ bool VPTree::_isLeaf()
 }
 
 double VPTree::_findMedian(deque<double>distances) 
-{ 
-  
-  /*size_t size = distances.size();
+{
+  /*accumulator_set<double, features<tag::mean, tag::median> > acc;
+  for (auto d: distances)
+    acc(d);
+  for_each(begin(distances), end(distances), ref(distances));
+  return median(acc);*/
+  size_t size = distances.size();
   
   if (size == 0)
     {
@@ -140,7 +149,7 @@ double VPTree::_findMedian(deque<double>distances)
   else
     {
   // First we sort the array 
-      qsort(distances.begin(),distances.end()); 
+      sort(distances.begin(),distances.end()); 
       
       if (size % 2 == 0)
 	{
@@ -150,10 +159,7 @@ double VPTree::_findMedian(deque<double>distances)
 	{
 	  return distances[size/2];
 	} 
-	}*/
-  size_t n = distances.size()/2;
-  nth_element(distances.begin(),distances.begin()+n,distances.end());
-  return distances[n];  
+    }
 }
   
 deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
@@ -175,8 +181,9 @@ deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
 
       double dist = distance->calculateDistance(query,point);
       if (dist < maxDistance)
-	neighbors.push_back(make_pair(dist,point));
-      
+	{
+	  neighbors.push_back(make_pair(dist,point));
+	}
       if (node->_isLeaf())
 	continue;
       if (node->left_min <= dist && dist <= node->left_max)
@@ -205,7 +212,7 @@ deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
 	    dd = dist - node->right_max;
 	  nodes_to_visit.push_back(make_pair(node->right,dd));
 	}
-    }	     
+    }
   return neighbors;
 }
 
