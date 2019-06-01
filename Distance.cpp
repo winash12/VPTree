@@ -25,7 +25,14 @@ double GreatCircleDistance::calculateDistance(const Point& point1,const Point& p
   //cout << "The value of distance is " << distance << endl;
   if (!(distance >= 0))
     throw GeographicErr("distance does not satisfy d >= 0");
-  double Re = 6371.;
-  distance = Re * M_PI * distance/180.;
+  distance = deg2km(distance);
   return distance;
+}
+
+double GreatCircleDistance::deg2km(double d)
+{
+  double Re = 6371.;
+  double km;
+  km = (d * M_PI * Re)/180.;
+  return km;
 }

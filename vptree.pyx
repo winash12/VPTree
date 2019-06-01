@@ -53,7 +53,7 @@ cdef class PyVPTree:
             point.setCoordinate1(points[i,0])
             point.setCoordinate2(points[i,1])
             #printf("%f\t%f\n",point.getCoordinate1(),point.getCoordinate2())
-            self.points.push_front(point)
+            self.points.push_back(point)
 
     def initializePoints(self):
         self.vptree.initializeVPTreePoints(self.points)
@@ -61,11 +61,13 @@ cdef class PyVPTree:
     def getNeighborsInRange(self,np.ndarray[np.float64_t,ndim=2] gridPoints,np.float64_t maxDistance):
         accumulatedResult = []
         t0 = time.time()
+        print(len(gridPoints))
         for i in range(0,len(gridPoints)):
             result = []
             result = self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
             if result:
-                print(result)
+                for j,k in result:
+                    print(k)
             accumulatedResult.append(result)
         t1 = time.time()
         print(t1-t0)
