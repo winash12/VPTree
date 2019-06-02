@@ -1,11 +1,11 @@
 #include "Point.h"
 
-double Point::getCoordinate1()
+double Point::getCoordinate1() const
 {
   return coordinate1;
 }
 
-double Point::getCoordinate2()
+double Point::getCoordinate2() const
 {
   return coordinate2;
 }
@@ -23,12 +23,12 @@ void Point::setCoordinate2(double lon)
 }
 
 
-double SphericalPoint::getCoordinate1()
+double SphericalPoint::getCoordinate1() const
 {
   return latitude;
 }
 
-double SphericalPoint::getCoordinate2()
+double SphericalPoint::getCoordinate2() const
 {
   return longitude;
 }
