@@ -61,13 +61,12 @@ cdef class PyVPTree:
     def getNeighborsInRange(self,np.ndarray[np.float64_t,ndim=2] gridPoints,np.float64_t maxDistance):
         accumulatedResult = []
         t0 = time.time()
-        print(len(gridPoints))
         for i in range(0,len(gridPoints)):
             result = []
             result = self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
-            if result:
-                for j,k in result:
-                    print(k)
+            #if result:
+            #    for j,k in result:
+            #        print(k)
             accumulatedResult.append(result)
         t1 = time.time()
         print(t1-t0)
