@@ -16,7 +16,7 @@ from libcpp.memory cimport shared_ptr,unique_ptr,make_shared,make_unique,dynamic
 from libcpp.vector cimport vector
 from libcpp.deque cimport deque
 from libcpp.pair cimport pair
-
+from libcpp.list cimport list
 
 from cython.operator cimport dereference
 from cython.operator cimport postincrement as inc
@@ -61,18 +61,34 @@ cdef class PyVPTree:
     def getNeighborsInRange(self,np.ndarray[np.float64_t,ndim=2] gridPoints,np.float64_t maxDistance):
         accumulatedResult = []
         t0 = time.time()
+        cdef maxDist = <double>maxDistance
+        cdef deque[pair[double,Point]] deq
+        cdef double qpoint[2]
         for i in range(0,len(gridPoints)):
             result = []
-            result = self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
-            #if result:
-            #    for j,k in result:
-            #        print(k)
+            qpoint = memoryview(gridPoints[i])
+            #self.getNeighborsInRangeForSingleQueryPoint(qpoint,maxDist)
+            #result = convertObjecttoPythonList(deq)
             accumulatedResult.append(result)
         t1 = time.time()
         print(t1-t0)
         return accumulatedResult
 
-    def getNeighborsInRangeForSingleQueryPoint(self,np.ndarray[np.float64_t,ndim=1] qpoint, np.float64_t maxDistance):
+    #def convertObjectToPythonList(deque[pair[double,Point]] deq):
+    #    cdef deque[pair[double,Point]].iterator it = deq.begin()
+    #    cdef Point p
+    #    result = []
+    #    while it != deq.end():
+    #        distance = dereference(it).first
+    #        p = dereference(it).second
+    #        lat = p.getCoordinate1()
+    #        lon = p.getCoordinate2()
+    #        p1 = np.c_[lat,lon]
+    #        inc(it)
+    #        result.append(tuple((distance,p1)))
+    #    return result
+
+    cdef getNeighborsInRangeForSingleQueryPoint(self,double qpoint[2], double maxDistance) nogil :
         cdef deque[pair[double,Point]] deq
         cdef SphericalPoint spoint
         cdef Point point
@@ -81,18 +97,7 @@ cdef class PyVPTree:
         point.setCoordinate1(qpoint[0])
         point.setCoordinate2(qpoint[1])
         deq = self.vptree.getAllInRange(point,maxDistance)
-
-        cdef deque[pair[double,Point]].iterator it = deq.begin()
-        result = []
-        while it != deq.end():
-            distance = dereference(it).first
-            p = dereference(it).second
-            lat = p.getCoordinate1()
-            lon = p.getCoordinate2()
-            p1 = np.c_[lat,lon]
-            inc(it)
-            result.append(tuple((distance,p1)))
-        return result
+        #return deq
         
     def __dealloc__(self):
         if self.vptree != NULL:
