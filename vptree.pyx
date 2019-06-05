@@ -8,8 +8,8 @@ cimport numpy as np
 cimport cython
 
 from multiprocessing import cpu_count
-import threading
-
+import psutil
+from concurrent.futures import ThreadPoolExecutor
 
 from libc.stdio cimport printf
 from libcpp.memory cimport shared_ptr,unique_ptr,make_shared,make_unique,dynamic_pointer_cast
@@ -59,9 +59,17 @@ cdef class PyVPTree:
         self.vptree.initializeVPTreePoints(self.points)
 
     def getNeighborsInRange(self,np.ndarray[np.float64_t,ndim=2] gridPoints,np.float64_t maxDistance):
+        number_of_processors = psutil.cpu_count(logical=False)
+        chunk = np.array_split(gridPoints,number_of_processors,axis=0)
+        x = ThreadPoolExecutor(max_workers=number_of_processors) 
+        results = x.map(self.getNeighborsInRangeChunk, chunk)
+        return results
+
+    def getNeighborsInRangeChunk(self,np.ndarray[np.float64_t,ndim=2] gridPoints,np.float64_t maxDistance):
         accumulatedResult = []
         t0 = time.time()
         cdef deque[pair[double,Point]] deq
+
         for i in range(0,len(gridPoints)):
             result = []
             self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
