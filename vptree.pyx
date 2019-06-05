@@ -62,20 +62,18 @@ cdef class PyVPTree:
         number_of_processors = psutil.cpu_count(logical=False)
         chunk = np.array_split(gridPoints,number_of_processors,axis=0)
         x = ThreadPoolExecutor(max_workers=number_of_processors) 
+        t0 = time.time()
         results = x.map(self.getNeighborsInRangeChunk, chunk)
+        t1 = time.time()
+        print(t1-t0)
         return results
 
     def getNeighborsInRangeChunk(self,np.ndarray[np.float64_t,ndim=2] gridPoints,np.float64_t maxDistance):
         accumulatedResult = []
-        t0 = time.time()
-        cdef deque[pair[double,Point]] deq
-
         for i in range(0,len(gridPoints)):
             result = []
             self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
             accumulatedResult.append(result)
-        t1 = time.time()
-        print(t1-t0)
         return accumulatedResult
 
     def getNeighborsInRangeForSingleQueryPoint(self,np.ndarray[np.float64_t,ndim=1] qpoint, np.float64_t maxDistance)  :
