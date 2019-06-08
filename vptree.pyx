@@ -7,7 +7,6 @@ cimport numpy as np
 
 cimport cython
 
-from multiprocessing import cpu_count
 import psutil
 from concurrent.futures import ThreadPoolExecutor
 
@@ -63,7 +62,8 @@ cdef class PyVPTree:
         chunk = np.array_split(gridPoints,number_of_processors,axis=0)
         x = ThreadPoolExecutor(max_workers=number_of_processors) 
         t0 = time.time()
-        results = x.map(self.getNeighborsInRangeChunk, chunk)
+        args = ((chunk,maxDistance))
+        results = x.map(self.getNeighborsInRangeChunk, args)
         t1 = time.time()
         print(t1-t0)
         return results
@@ -71,8 +71,7 @@ cdef class PyVPTree:
     def getNeighborsInRangeChunk(self,np.ndarray[np.float64_t,ndim=2] gridPoints,np.float64_t maxDistance):
         accumulatedResult = []
         for i in range(0,len(gridPoints)):
-            result = []
-            self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
+            result = self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
             accumulatedResult.append(result)
         return accumulatedResult
 
