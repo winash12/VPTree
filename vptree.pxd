@@ -1,15 +1,13 @@
-from libcpp.memory cimport shared_ptr
-from libcpp.vector cimport vector
 from libcpp.deque cimport deque
 from libcpp.pair cimport pair
 
 
 cdef extern from "VPTree.h":
     cdef cppclass VPTree:
-       VPTree() except +
-       deque[pair[double,Point]] getAllInRange(Point point,double maxDistance) nogil 
-       void initializeVPTreePoints(deque[Point] points)
-       void initializeDistance(Distance *distance)
+       VPTree() nogil except +
+       deque[pair[double,Point]] getAllInRange(Point point,double maxDistance) nogil
+       void initializeVPTreePoints(deque[Point] points) nogil
+       void initializeDistance(Distance *distance) nogil
        
 cdef extern from "Distance.h" :
     cdef cppclass Distance:
