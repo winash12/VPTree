@@ -13,6 +13,7 @@ from functools import partial
 
 from libc.stdio cimport printf
 from libcpp.deque cimport deque
+from libcpp.vector cimport vector
 from libcpp.pair cimport pair
 
 from cython.operator cimport dereference
@@ -54,7 +55,7 @@ cdef class PyVPTree:
 
     def initializePoints(self):
         self.vptree.initializeVPTreePoints(self.points)
-
+    
     def getNeighborsInRange(self,np.ndarray[np.float64_t,ndim=2] gridPoints,np.float64_t maxDistance):
         number_of_processors = psutil.cpu_count(logical=False)
         chunk = np.array_split(gridPoints,number_of_processors,axis=0)
@@ -73,8 +74,8 @@ cdef class PyVPTree:
             result = self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
             accumulatedResult.append(result)
         return accumulatedResult
-
-    cdef getNeighborsInRangeForSingleQueryPoint(self,np.ndarray[np.float64_t,ndim=1] qpoint, np.float64_t maxDistance) nogil :
+    
+    cdef vector[pair[double,Point]] getNeighborsInRangeForSingleQueryPoint(self,double[:] qpoint, double  maxDistance) :
         cdef deque[pair[double,Point]] deq
         cdef SphericalPoint spoint
         cdef Point point
@@ -85,15 +86,22 @@ cdef class PyVPTree:
         with nogil:
             deq = self.vptree.getAllInRange(point,maxDistance)
         cdef deque[pair[double,Point]].iterator it = deq.begin()
-        result = []
+        cdef vector[pair[double,Point]] result  
+        cdef double[2] p1
+        cdef double distance
+        cdef Point p
+        cdef pair[double,Point] entry
         while it != deq.end():
             distance = dereference(it).first
             p = dereference(it).second
             lat = p.getCoordinate1()
             lon = p.getCoordinate2()
-            p1 = np.c_[lat,lon]
+            p1[0] = lat
+            p1[1] = lon
             inc(it)
-            result.append(tuple((distance,p1)))
+            entry.first = distance
+            entry.second = p
+            result.push_back(entry)
         return result
 
         
