@@ -71,34 +71,36 @@ cdef class PyVPTree:
 
     def getNeighborsInRangeChunk(self,np.float64_t maxDistance,np.ndarray[np.float64_t,ndim=2] gridPoints):
         print(maxDistance)
-        accumulatedResult = []
         cdef deque[pair[double,Point]] deq
         cdef double[:,:] gPoints
+        cdef vector[pair[double,Point]] result
+        cdef vector[vector[pair[double,Point]]] accumulatedResult
         gPoints = memoryview(gridPoints)
+        resultList = []
         with nogil:
             for i in range(gPoints.shape[0]):
                 deq = self.getNeighborsInRangeForSingleQueryPoint(gPoints[i],maxDistance)
-                self.processResult(deq)
-        return accumulatedResult
+                result = self.processResult(deq)
+                accumulatedResult.push_back(result)
+        return resultList
 
     @cython.boundscheck(False)
-    cdef vector[pair[double,double[2]]] processResult(self,deque[pair[double,Point]] deq) nogil:
+    cdef vector[pair[double,Point]] processResult(self,deque[pair[double,Point]] deq) nogil:
 
         cdef deque[pair[double,Point]].iterator it = deq.begin()
-        cdef double[2] p1
         cdef double distance
         cdef Point p
-        cdef pair[double,double[2]] entry
-        cdef vector[pair[double,double[2]]] result  
+        cdef pair[double,Point] entry
+        cdef vector[pair[double,Point]] result  
         while it != deq.end():
             distance = dereference(it).first
             p = dereference(it).second
             lat = p.getCoordinate1()
             lon = p.getCoordinate2()
-            p1[0] = lat
-            p1[1] = lon
+            #p1[0] = lat
+            #p1[1] = lon
             entry.first = distance
-            entry.second = p1
+            entry.second = p
             result.push_back(entry)
             inc(it)
         return result
