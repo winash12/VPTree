@@ -57,6 +57,7 @@ cdef class PyVPTree:
         self.vptree.initializeVPTreePoints(self.points)
     
     def getNeighborsInRange(self,np.ndarray[np.float64_t,ndim=2] gridPoints,np.float64_t maxDistance):
+
         number_of_processors = psutil.cpu_count(logical=False)
         chunk = np.array_split(gridPoints,number_of_processors,axis=0)
         x = ThreadPoolExecutor(max_workers=number_of_processors) 
@@ -65,32 +66,30 @@ cdef class PyVPTree:
         results = x.map(func,chunk)
         t1 = time.time()
         print(t1-t0)
+
         return results
 
     def getNeighborsInRangeChunk(self,np.float64_t maxDistance,np.ndarray[np.float64_t,ndim=2] gridPoints):
         print(maxDistance)
         accumulatedResult = []
-        for i in range(0,len(gridPoints)):
-            result = self.getNeighborsInRangeForSingleQueryPoint(gridPoints[i],maxDistance)
-            accumulatedResult.append(result)
-        return accumulatedResult
-    
-    cdef vector[pair[double,Point]] getNeighborsInRangeForSingleQueryPoint(self,double[:] qpoint, double  maxDistance) :
         cdef deque[pair[double,Point]] deq
-        cdef SphericalPoint spoint
-        cdef Point point
-        spoint = SphericalPoint()
-        point = <Point>spoint
-        point.setCoordinate1(qpoint[0])
-        point.setCoordinate2(qpoint[1])
+        cdef double[:,:] gPoints
+        gPoints = memoryview(gridPoints)
         with nogil:
-            deq = self.vptree.getAllInRange(point,maxDistance)
+            for i in range(gPoints.shape[0]):
+                deq = self.getNeighborsInRangeForSingleQueryPoint(gPoints[i],maxDistance)
+                self.processResult(deq)
+        return accumulatedResult
+
+    @cython.boundscheck(False)
+    cdef vector[pair[double,double[2]]] processResult(self,deque[pair[double,Point]] deq) nogil:
+
         cdef deque[pair[double,Point]].iterator it = deq.begin()
-        cdef vector[pair[double,Point]] result  
         cdef double[2] p1
         cdef double distance
         cdef Point p
-        cdef pair[double,Point] entry
+        cdef pair[double,double[2]] entry
+        cdef vector[pair[double,double[2]]] result  
         while it != deq.end():
             distance = dereference(it).first
             p = dereference(it).second
@@ -98,11 +97,23 @@ cdef class PyVPTree:
             lon = p.getCoordinate2()
             p1[0] = lat
             p1[1] = lon
-            inc(it)
             entry.first = distance
-            entry.second = p
+            entry.second = p1
             result.push_back(entry)
+            inc(it)
         return result
+
+    @cython.boundscheck(False)
+    cdef deque[pair[double,Point]] getNeighborsInRangeForSingleQueryPoint(self,double[:] qpoint, double  maxDistance) nogil :
+        cdef deque[pair[double,Point]] deq
+        cdef SphericalPoint spoint
+        cdef Point point
+        spoint = SphericalPoint()
+        point = <Point>spoint
+        point.setCoordinate1(qpoint[0])
+        point.setCoordinate2(qpoint[1])
+        deq = self.vptree.getAllInRange(point,maxDistance)
+        return deq
 
         
     def __dealloc__(self):
