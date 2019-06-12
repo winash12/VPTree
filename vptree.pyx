@@ -96,7 +96,6 @@ cdef class PyVPTree:
                 p1 = np.c_[lat,lon]
                 resultList.append(tuple((distance,p1)))
                 inc(it1)
-                
             accumulatedResultList.append(resultList)
             inc(it)
         return accumulatedResultList
@@ -124,8 +123,6 @@ cdef class PyVPTree:
         while it != deq.end():
             distance = dereference(it).first
             p = dereference(it).second
-            lat = p.getCoordinate1()
-            lon = p.getCoordinate2()
             entry.first = distance
             entry.second = p
             result.push_back(entry)
