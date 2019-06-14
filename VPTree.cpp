@@ -155,7 +155,30 @@ double VPTree::_findMedian(deque<double>distances)
 	} 
     }
 }
-  
+
+std::vector<std::deque<std::pair<double,Point>>> VPTree::getAllInRange(std::deque<Point> queryPoints,double maxDistance)
+{
+  std::deque<Point>::iterator it;
+
+  std::vector<std::deque<std::pair<double,Point>>> neighborCollection;
+  try
+    {
+      for (it = queryPoints.begin();it != queryPoints.end();++it)
+	{
+	  Point query = *it;
+	  deque<pair<double,Point>> neighbors;
+	  neighbors = getAllInRange(query,maxDistance);
+	  neighborCollection.push_back(neighbors);
+	}
+    }
+  catch(const std::out_of_range& oor)
+    {
+      exit(0);
+    }
+  cout << "The lengt of nc is " << size(neighborCollection) << endl;
+  return neighborCollection;
+}
+
 deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
 {
   deque<pair<double,Point>> neighbors;
@@ -163,6 +186,7 @@ deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
   VPTree *node;
   double d0;
   nodes_to_visit.push_front(make_pair(this,0));
+
   while (nodes_to_visit.size() > 0 )
     {
       deque<pair<VPTree*,double>>::iterator it = nodes_to_visit.begin();
