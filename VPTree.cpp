@@ -11,6 +11,9 @@
 #include <boost/accumulators/statistics.hpp>
 #include <typeinfo>
 #include <memory>
+#include <xtensor/xarray.hpp>
+#include <xtensor/xsort.hpp>
+#include <xtensor/xadapt.hpp>
 #include "VPTree.h"
 
 using namespace std;
@@ -44,6 +47,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
     }
   deque<Point>::iterator it;
   deque<double> distances;
+  xt::xarray<double> xdistances;
   try
     {
       for (it = points.begin();it != points.end();++it)
@@ -52,6 +56,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 	  Point point = *it;
 	  d = distance->calculateDistance(vp,point);
 	  distances.push_back(d);
+	  //xdistances.cend(d);
 	}
     }
   catch (const std::out_of_range& oor)
@@ -60,7 +65,8 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
       exit(0);
     }
 
-  double median = _findMedian(distances);
+
+  double median = xt::median(xt::adapt(distances));
   //cout <<"The value of median is " << median << endl;
   time(&end);
 
