@@ -20,6 +20,7 @@ cdef extern from "Distance.h" :
 
 cdef extern from "Point.h":
     cdef cppclass Point:
+<<<<<<< HEAD
        Point() nogil except +
        double getCoordinate1() nogil
        double getCoordinate2() nogil 
@@ -32,3 +33,17 @@ cdef extern from "Point.h":
        double getCoordinate2() nogil 
        void setCoordinate1(double lat) nogil 
        void setCoordinate2(double lon) nogil
+=======
+       Point() except +
+       double getCoordinate1()
+       double getCoordinate2()
+       void setCoordinate1(double coordinate1)
+       void setCoordinate2(double coordinate2)
+       
+    cdef cppclass SphericalPoint(Point):
+       SphericalPoint() except +
+       double getCoordinate1()
+       double getCoordinate2()
+       void setCoordinate1(double lat)
+       void setCoordinate2(double lon)
+>>>>>>> 1bcd073577d96f4bf5461dca87f11d37008c3d57
