@@ -81,9 +81,8 @@ cdef class PyVPTree:
         with nogil:
             for i in range(gPoints.shape[0]):
                 deq = self.getNeighborsInRangeForSingleQueryPoint(gPoints[i],maxDistance)
-                #result = self.processResult(deq)
-                #accumulatedResult.push_back(result)
-                i = 0
+                result = self.processResult(deq)
+                accumulatedResult.push_back(result)
         return resultList
 
     @cython.boundscheck(True)
