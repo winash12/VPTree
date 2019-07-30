@@ -185,6 +185,10 @@ std::vector<std::deque<std::pair<double,Point>>> VPTree::getAllInRange(std::dequ
   return neighborCollection;
 }
 
+//NPY_BEGIN_ALLOW_THREADS
+//NPY_END_ALLOW_THREADS
+//Similar to Py_BEGIN_ALLOW_THREADS
+// And Py_END_ALLOW_THREADS
 deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
 {
   deque<pair<double,Point>> neighbors;
