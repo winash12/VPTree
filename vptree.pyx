@@ -75,6 +75,11 @@ cdef class PyVPTree:
         cdef deque[pair[double,Point]] deq
         cdef double[:,:] gPoints
         cdef vector[deque[pair[double,Point]]] collectionOfDeq
+        cdef vector[deque[pair[double,Point]]].iterator it = collectionOfDeq.begin()
+        cdef deque[pair[double,Point]].iterator it2 = deq.begin()
+        cdef double distance
+        cdef Point p
+
         collectionOfDeq = vector[deque[pair[double,Point]]]()
         gPoints = memoryview(gridPoints)
         resultList = []
@@ -82,24 +87,18 @@ cdef class PyVPTree:
             for i in range(gPoints.shape[0]):
                 deq = self.getNeighborsInRangeForSingleQueryPoint(gPoints[i],maxDistance)
                 collectionOfDeq.push_back(deq)
-        return resultList
-
-    @cython.boundscheck(True)
-    cdef vector[pair[double,Point]] processResult(self,deque[pair[double,Point]] deq) nogil:
-
-        cdef deque[pair[double,Point]].iterator it = deq.begin()
-        cdef double distance
-        cdef Point p
-        cdef pair[double,Point] entry
-        cdef vector[pair[double,Point]] result  
-        while it != deq.end():
-            distance = dereference(it).first
-            p = dereference(it).second
-            entry.first = distance
-            entry.second = p
-            result.push_back(entry)
+        while it != collectionOfDeq.end():
+            deq = dereference(it)
+            result = []  
+            while it2 != deq.end():
+                distance = dereference(it2).first
+                p = dereference(it2).second
+                p1 = np.array([p.getCoordinate1(),p.getCoordinate2()])
+                result.append(tuple((distance,p1)))
+                inc(it2)
+            resultList.append(result)
             inc(it)
-        return result
+        return resultList
 
     @cython.boundscheck(True)
     cdef deque[pair[double,Point]] getNeighborsInRangeForSingleQueryPoint(self,double[:] qpoint, double  maxDistance) nogil :
