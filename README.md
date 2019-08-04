@@ -4,9 +4,9 @@ To build this project all you have to do is
 
 b) Boost libraries - The C++ code needs Boost. Install them as per your OS flavor
 
-c) Install https://github.com/QuantStack/xtensor and xtl as well
+c) Install https://github.com/QuantStack/xtensor and https://github.com/QuantStack/xtl as well
 
-Build, test and install then type
+Build, test and install the above three then type
 
 2) python3.6 setup.py build_ext --inplace
 
