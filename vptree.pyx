@@ -32,6 +32,7 @@ cdef class PyVPTree:
     cdef Distance *gcd
 
 
+
     def __cinit__(self):
         self.vptree = new VPTree()
         self.points = deque[Point]()
@@ -72,25 +73,25 @@ cdef class PyVPTree:
     def getNeighborsInRangeChunk(self,np.float64_t maxDistance,np.ndarray[np.float64_t,ndim=2] gridPoints):
         print(maxDistance)
         cdef int i
-        cdef deque[pair[double,Point]] deq
+        cdef deque[pair[double,Point]] deq1
         cdef double[:,:] gPoints
-        cdef vector[deque[pair[double,Point]]] collectionOfDeq
-        cdef vector[deque[pair[double,Point]]].iterator it = collectionOfDeq.begin()
-        cdef deque[pair[double,Point]].iterator it2 = deq.begin()
         cdef double distance
         cdef Point p
-
-        collectionOfDeq = vector[deque[pair[double,Point]]]()
+        cdef vector[deque[pair[double,Point]]] collectionOfDeq = vector[deque[pair[double,Point]]]()
+        cdef vector[deque[pair[double,Point]]].iterator it
+        cdef deque[pair[double,Point]].iterator it2
         gPoints = memoryview(gridPoints)
         resultList = []
         with nogil:
             for i in range(gPoints.shape[0]):
-                deq = self.getNeighborsInRangeForSingleQueryPoint(gPoints[i],maxDistance)
-                collectionOfDeq.push_back(deq)
+                collectionOfDeq.push_back(move(self.getNeighborsInRangeForSingleQueryPoint(gPoints[i],maxDistance)))
+                
+        it = collectionOfDeq.begin()
         while it != collectionOfDeq.end():
-            deq = dereference(it)
+            deq1 = dereference(it)
             result = []  
-            while it2 != deq.end():
+            it2 = deq1.begin()
+            while it2 != deq1.end():
                 distance = dereference(it2).first
                 p = dereference(it2).second
                 p1 = np.array([p.getCoordinate1(),p.getCoordinate2()])
