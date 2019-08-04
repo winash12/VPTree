@@ -1,6 +1,8 @@
 from libcpp.deque cimport deque
 from libcpp.pair cimport pair
 
+cdef extern from "<utility>" namespace "std" nogil:
+  T move[T](T)
 
 cdef extern from "VPTree.h":
     cdef cppclass VPTree:
@@ -11,11 +13,11 @@ cdef extern from "VPTree.h":
        
 cdef extern from "Distance.h" :
     cdef cppclass Distance:
-       Distance() except +
-       double calculateDistance(Point point1,Point point2)	
+       Distance() nogil except +
+       double calculateDistance(Point point1,Point point2) nogil
     cdef cppclass GreatCircleDistance(Distance):
-       GreatCircleDistance() except +
-       double calculateDistance(Point point1,Point point2)
+       GreatCircleDistance() nogil except +
+       double calculateDistance(Point point1,Point point2) nogil
 											
 
 cdef extern from "Point.h":
@@ -32,4 +34,3 @@ cdef extern from "Point.h":
        double getCoordinate2() nogil 
        void setCoordinate1(double lat) nogil 
        void setCoordinate2(double lon) nogil
-
