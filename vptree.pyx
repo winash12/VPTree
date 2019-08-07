@@ -111,8 +111,8 @@ cdef class PyVPTree:
         point = <Point>spoint
         point.setCoordinate1(qpoint[0])
         point.setCoordinate2(qpoint[1])
-        deq = self.vptree.getAllInRange(point,maxDistance)
-        return deq
+        return move(self.vptree.getAllInRange(point,maxDistance))
+    
 
         
     def __dealloc__(self):
