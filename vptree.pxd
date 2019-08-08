@@ -2,22 +2,23 @@ from libcpp.deque cimport deque
 from libcpp.pair cimport pair
 
 cdef extern from "<utility>" namespace "std" nogil:
-  T move[T](T)
+  deque[Point]&& move(deque[Point]&&)
 
 cdef extern from "VPTree.h":
     cdef cppclass VPTree:
        VPTree() nogil except +
-       deque[pair[double,Point]] getAllInRange(Point point,double maxDistance) nogil
-       void initializeVPTreePoints(deque[Point] points) nogil
-       void initializeDistance(Distance *distance) nogil
+       #deque[pair[double,Point]] getAllInRange(Point point,double maxDistance) nogil
+       deque[pair[double,Point]] getAllInRange(Point point,double maxDistance)
+       void initializeVPTreePoints(deque[Point] points) 
+       void initializeDistance(Distance *distance) 
        
 cdef extern from "Distance.h" :
     cdef cppclass Distance:
-       Distance() nogil except +
-       double calculateDistance(Point point1,Point point2) nogil
+       Distance() except +
+       double calculateDistance(Point point1,Point point2) 
     cdef cppclass GreatCircleDistance(Distance):
-       GreatCircleDistance() nogil except +
-       double calculateDistance(Point point1,Point point2) nogil
+       GreatCircleDistance()  except +
+       double calculateDistance(Point point1,Point point2) 
 											
 
 cdef extern from "Point.h":
