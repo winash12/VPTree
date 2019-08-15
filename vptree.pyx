@@ -64,6 +64,7 @@ cdef class PyVPTree:
         print(t0)
         func = partial(self.getNeighborsInRangeChunk,maxDistance)
         results = x.map(func,chunk)
+        results = np.vstack(list(results))
         t1 = time.time()
         print(t1)
         print(t1-t0)
@@ -84,7 +85,6 @@ cdef class PyVPTree:
         with nogil:
             for i in range(gPoints.shape[0]):
                 collectionOfDeq.push_back(self.getNeighborsInRangeForSingleQueryPoint(gPoints[i],maxDistance))
-
         it = collectionOfDeq.begin()
         while it != collectionOfDeq.end():
             deq1 = dereference(it)
@@ -102,7 +102,7 @@ cdef class PyVPTree:
             inc(it)
         return resultList
 
-    @cython.boundscheck(True)
+    @cython.boundscheck(False)
     cdef deque[pair[double,Point]] getNeighborsInRangeForSingleQueryPoint(self,double[:] qpoint, double  maxDistance) nogil :
         cdef deque[pair[double,Point]] deq
         cdef SphericalPoint spoint

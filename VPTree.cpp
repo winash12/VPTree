@@ -16,10 +16,9 @@
 #include <xtensor/xadapt.hpp>
 #include "VPTree.h"
 
-using namespace std;
-using std::vector;
 using std::deque;
 using namespace boost::accumulators;
+
 
 void VPTree::initializeDistance(Distance *pfunc)
 {
@@ -47,7 +46,6 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
     }
   deque<Point>::iterator it;
   deque<double> distances;
-  xt::xarray<double> xdistances;
   try
     {
       for (it = points.begin();it != points.end();++it)
@@ -56,7 +54,6 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 	  Point point = *it;
 	  d = distance->calculateDistance(vp,point);
 	  distances.push_back(d);
-	  //xdistances.cend(d);
 	}
     }
   catch (const std::out_of_range& oor)
@@ -64,7 +61,6 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
       std::cerr <<"Out of Range error: " << oor.what() << endl;
       exit(0);
     }
-
 
   double median = xt::median(xt::adapt(distances));
   //cout <<"The value of median is " << median << endl;
@@ -125,6 +121,27 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
       this->right->initializeVPTreePoints(right_points);
     }
 }
+Point VPTree::_selectVantagePoint()
+{
+  Point bestPoint;
+  Point p;
+  double bestSpread = 0;
+  double spread = 0;
+  /*
+   P = Random Sample of S;
+   for p element of P
+	   D = Random Sample of S;
+     mu = Median(p,d)
+     spread = secondMoment()
+     if spread > bestSpread
+     {
+        bestSpread = spread;
+        bestPoint = point;
+        break;
+     }
+  */
+  return bestPoint;
+}
 
 bool VPTree::_isLeaf()
 {
@@ -162,11 +179,11 @@ double VPTree::_findMedian(deque<double>distances)
     }
 }
 
-std::vector<std::deque<std::pair<double,Point>>> VPTree::getAllInRange(std::deque<Point> queryPoints,double maxDistance)
+std::deque<std::deque<std::pair<double,Point>>> VPTree::getAllInRange(std::deque<Point> queryPoints,double maxDistance)
 {
   std::deque<Point>::iterator it;
 
-  std::vector<std::deque<std::pair<double,Point>>> neighborCollection;
+  std::deque<std::deque<std::pair<double,Point>>> neighborCollection;
   try
     {
       for (it = queryPoints.begin();it != queryPoints.end();++it)
@@ -208,6 +225,7 @@ deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
       Point point = node->vp;
 
       double dist = distance->calculateDistance(query,point);
+
       if (dist < maxDistance)
 	{
 	  neighbors.push_back(make_pair(dist,point));
