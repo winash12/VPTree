@@ -16,6 +16,7 @@
 #include <xtensor/xarray.hpp>
 #include <xtensor/xsort.hpp>
 #include <xtensor/xadapt.hpp>
+#include <xtensor/xmath.hpp>
 #include "VPTree.h"
 
 using std::deque;
@@ -155,14 +156,15 @@ Point VPTree::_selectVantagePoint(deque<Point> points)
 	    std::cerr <<"Out of Range error: " << oor.what() << endl;
 	    exit(0);
 	  }
-	spread = xt::variance(xt::adapt(distances));
+	spread = xt::variance(xt::adapt(distances))();
 	if (spread > bestSpread)
 	  {
 	    bestSpread = spread;
 	    bestPoint = p;
-	    return bestPoint;
+	    break;
 	  }
     }
+  return bestPoint;
 }
 
 bool VPTree::_isLeaf()
