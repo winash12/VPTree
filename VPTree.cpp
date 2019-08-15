@@ -125,15 +125,15 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 }
 Point VPTree::_selectVantagePoint(deque<Point> points)
 {
-  deque<Point> randomPointsP;
-  deque<Point> randomPointsD;
-  deque<Point>::iterator it;
+  vector<Point> randomPointsP;
+  vector<Point> randomPointsD;
+  vector<Point>::iterator it;
   Point bestPoint;
   Point p;
   double bestSpread = 0;
   double spread = 0;
   size_t nelems = points.size()/10;
-  deque<double> distances;
+  vector<double> distances;
   std::sample(points.begin(),points.end(),std::back_inserter(randomPointsP),
 	      nelems,std::mt19937{std::random_device{}()});
   for (auto p:randomPointsP)
@@ -155,23 +155,14 @@ Point VPTree::_selectVantagePoint(deque<Point> points)
 	    std::cerr <<"Out of Range error: " << oor.what() << endl;
 	    exit(0);
 	  }
-
-	double median = xt::median(xt::adapt(distances));
-
+	spread = xt::variance(xt::adapt(distances));
+	if (spread > bestSpread)
+	  {
+	    bestSpread = spread;
+	    bestPoint = p;
+	    return bestPoint;
+	  }
     }
-  /*
-   for p element of P
-	   D = Random Sample of S;
-     mu = Median(p,d)
-     spread = secondMoment()
-     if spread > bestSpread
-     {
-        bestSpread = spread;
-        bestPoint = point;
-        break;
-     }
-  */
-  return bestPoint;
 }
 
 bool VPTree::_isLeaf()
