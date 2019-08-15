@@ -5,6 +5,8 @@
 #include <fstream>
 #include <deque>
 #include <list>
+#include <algorithm>
+#include <random>
 #include <boost/optional.hpp>
 #include <boost/range/combine.hpp>
 #include <boost/accumulators/accumulators.hpp>
@@ -121,14 +123,43 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
       this->right->initializeVPTreePoints(right_points);
     }
 }
-Point VPTree::_selectVantagePoint()
+Point VPTree::_selectVantagePoint(deque<Point> points)
 {
+  deque<Point> randomPointsP;
+  deque<Point> randomPointsD;
+  deque<Point>::iterator it;
   Point bestPoint;
   Point p;
   double bestSpread = 0;
   double spread = 0;
+  size_t nelems = points.size()/10;
+  deque<double> distances;
+  std::sample(points.begin(),points.end(),std::back_inserter(randomPointsP),
+	      nelems,std::mt19937{std::random_device{}()});
+  for (auto p:randomPointsP)
+    {
+      std::sample(points.begin(),points.end(),std::back_inserter(randomPointsD),
+	      nelems,std::mt19937{std::random_device{}()});
+	try
+	  {
+	    for (it = randomPointsD.begin();it != randomPointsD.end();++it)
+	      {
+		double d;
+		Point point = *it;
+		d = distance->calculateDistance(p,point);
+		distances.push_back(d);
+	      }
+	  }
+	catch (const std::out_of_range& oor)
+	  {
+	    std::cerr <<"Out of Range error: " << oor.what() << endl;
+	    exit(0);
+	  }
+
+	double median = xt::median(xt::adapt(distances));
+
+    }
   /*
-   P = Random Sample of S;
    for p element of P
 	   D = Random Sample of S;
      mu = Median(p,d)

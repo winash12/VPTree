@@ -35,7 +35,7 @@ class VPTree
   bool _isLeaf();
 
   double _findMedian(std::deque<double>distances);
-  Point _selectVantagePoint();
+  Point _selectVantagePoint(deque<Point> points);
  public:
 
   VPTree(){};
