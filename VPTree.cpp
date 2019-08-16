@@ -130,7 +130,6 @@ Point VPTree::_selectVantagePoint(deque<Point> points)
   vector<Point> randomPointsD;
   vector<Point>::iterator it;
   Point bestPoint;
-  Point p;
   double bestSpread = 0;
   double spread = 0;
   size_t nelems = points.size()/10;
