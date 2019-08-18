@@ -73,24 +73,24 @@ cdef class PyVPTree:
     def getNeighborsInRangeChunk(self,np.float64_t maxDistance,np.ndarray[np.float64_t,ndim=2] gridPoints):
 
 
-        cdef deque[pair[double,Point]] deq1
+        cdef vector[pair[double,Point]] vec1
         cdef double[:,:] gPoints
         cdef double distance
         cdef Point p
-        cdef deque[deque[pair[double,Point]]] collectionOfDeq = deque[deque[pair[double,Point]]]()
-        cdef deque[deque[pair[double,Point]]].iterator it
-        cdef deque[pair[double,Point]].iterator it2
+        cdef vector[vector[pair[double,Point]]] collectionOfVec = vector[vector[pair[double,Point]]]()
+        cdef vector[vector[pair[double,Point]]].iterator it
+        cdef vector[pair[double,Point]].iterator it2
         gPoints = memoryview(gridPoints)
         resultList = []
         with nogil:
             for i in range(gPoints.shape[0]):
-                collectionOfDeq.push_back(self.getNeighborsInRangeForSingleQueryPoint(gPoints[i],maxDistance))
-        it = collectionOfDeq.begin()
-        while it != collectionOfDeq.end():
-            deq1 = dereference(it)
+                collectionOfVec.push_back(move(self.getNeighborsInRangeForSingleQueryPoint(gPoints[i],maxDistance)))
+        it = collectionOfVec.begin()
+        while it != collectionOfVec.end():
+            vec1 = dereference(it)
             result = []  
-            it2 = deq1.begin()
-            while it2 != deq1.end():
+            it2 = vec1.begin()
+            while it2 != vec1.end():
                 distance = dereference(it2).first
                 p = dereference(it2).second
                 p1 = np.array([p.getCoordinate1(),p.getCoordinate2()])
@@ -103,8 +103,8 @@ cdef class PyVPTree:
         return resultList
 
     @cython.boundscheck(False)
-    cdef deque[pair[double,Point]] getNeighborsInRangeForSingleQueryPoint(self,double[:] qpoint, double  maxDistance) nogil :
-        cdef deque[pair[double,Point]] deq
+    cdef vector[pair[double,Point]] getNeighborsInRangeForSingleQueryPoint(self,double[:] qpoint, double  maxDistance) nogil :
+        cdef vector[pair[double,Point]] vec
         cdef SphericalPoint spoint
         cdef Point point
 
@@ -112,7 +112,7 @@ cdef class PyVPTree:
         point = <Point>spoint
         point.setCoordinate1(qpoint[0])
         point.setCoordinate2(qpoint[1])
-        return move(self.vptree.getAllInRange(point,maxDistance))
+        return self.vptree.getAllInRange(point,maxDistance)
 
         
     def __dealloc__(self):

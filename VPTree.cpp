@@ -202,17 +202,17 @@ double VPTree::_findMedian(deque<double>distances)
     }
 }
 
-std::deque<std::deque<std::pair<double,Point>>> VPTree::getAllInRange(std::deque<Point> queryPoints,double maxDistance)
+std::vector<std::vector<std::pair<double,Point>>> VPTree::getAllInRange(std::vector<Point> queryPoints,double maxDistance)
 {
-  std::deque<Point>::iterator it;
+  std::vector<Point>::iterator it;
 
-  std::deque<std::deque<std::pair<double,Point>>> neighborCollection;
+  std::vector<std::vector<std::pair<double,Point>>> neighborCollection;
   try
     {
       for (it = queryPoints.begin();it != queryPoints.end();++it)
 	{
 	  Point query = *it;
-	  deque<pair<double,Point>> neighbors;
+	  vector<pair<double,Point>> neighbors;
 	  neighbors = getAllInRange(query,maxDistance);
 	  neighborCollection.push_back(neighbors);
 	}
@@ -229,9 +229,9 @@ std::deque<std::deque<std::pair<double,Point>>> VPTree::getAllInRange(std::deque
 //NPY_END_ALLOW_THREADS
 //Similar to Py_BEGIN_ALLOW_THREADS
 // And Py_END_ALLOW_THREADS
-deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
+vector<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
 {
-  deque<pair<double,Point>> neighbors;
+  vector<pair<double,Point>> neighbors;
   deque<pair<VPTree*,double>> nodes_to_visit;
   VPTree *node;
   double d0;
