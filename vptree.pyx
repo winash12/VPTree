@@ -22,8 +22,7 @@ from cython.operator cimport postincrement as inc
 from vptree cimport VPTree
 from vptree cimport Distance
 from vptree cimport Point
-from vptree cimport SphericalPoint
-from vptree cimport GreatCircleDistance
+
 
 
 cdef class PyVPTree:
@@ -84,7 +83,8 @@ cdef class PyVPTree:
         resultList = []
         with nogil:
             for i in range(gPoints.shape[0]):
-                collectionOfVec.push_back(move(self.getNeighborsInRangeForSingleQueryPoint(gPoints[i],maxDistance)))
+                vec1 = move(self.getNeighborsInRangeForSingleQueryPoint(gPoints[i],maxDistance))
+                collectionOfVec.push_back(vec1)
         it = collectionOfVec.begin()
         while it != collectionOfVec.end():
             vec1 = dereference(it)

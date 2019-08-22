@@ -17,8 +17,7 @@ using namespace std;
 using std::vector;
 using std::deque;
 using std::pair;
-using std::unique_ptr;
-using std::shared_ptr;
+
 
 
 class VPTree
@@ -41,9 +40,14 @@ class VPTree
   VPTree(){};
   
   void initializeVPTreePoints(std::deque<Point> points);
-  
-  void initializeDistance(Distance *distance);
+
   std::vector<std::pair<double,Point>> getAllInRange(Point query ,double maxDistance);
   std::vector<std::vector<std::pair<double,Point>>> getAllInRange (std::vector<Point> queryPoints,double maxDistance);
+  template<typename T>
+    inline void initializeDistance(T&& distFunc)
+  {
+    distance = distFunc;
+  }
+
 };
 #endif /* VPTREE_H */

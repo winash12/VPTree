@@ -22,12 +22,6 @@
 using std::deque;
 using namespace boost::accumulators;
 
-
-void VPTree::initializeDistance(Distance *pfunc)
-{
-  distance = pfunc;
-}
-
 void VPTree::initializeVPTreePoints(deque<Point> points)
 {
   time_t start,end;
@@ -41,6 +35,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 
   time(&start);
   vp = points.front();
+  //vp = _selectVantagePoint(points);
   points.pop_front();
 
   if (points.size() == 0)
@@ -134,10 +129,12 @@ Point VPTree::_selectVantagePoint(deque<Point> points)
   double spread = 0;
   size_t nelems = points.size()/10;
   vector<double> distances;
+  // Gets one random selection of Points
   std::sample(points.begin(),points.end(),std::back_inserter(randomPointsP),
 	      nelems,std::mt19937{std::random_device{}()});
   for (auto p:randomPointsP)
     {
+      // Gets another random selection of Points
       std::sample(points.begin(),points.end(),std::back_inserter(randomPointsD),
 	      nelems,std::mt19937{std::random_device{}()});
 	try

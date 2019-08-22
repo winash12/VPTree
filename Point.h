@@ -6,6 +6,8 @@ class  Point
  private:
   double coordinate1,coordinate2;
  public:
+  Point();
+  Point(const Point&);
   virtual double  getCoordinate1() const;
   virtual double  getCoordinate2() const ;
   virtual void    setCoordinate1(double coordinate1);
@@ -17,6 +19,8 @@ class SphericalPoint : public Point
  private:
   double longitude,latitude;
  public:
+  SphericalPoint();
+  SphericalPoint(const SphericalPoint&);
   double getCoordinate1()  const;
   double getCoordinate2()  const ;
   void   setCoordinate1(double latitude);
