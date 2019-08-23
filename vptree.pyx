@@ -31,6 +31,7 @@ cdef class PyVPTree:
     cdef Distance *gcd
 
     def __cinit__(self):
+        print("hello")
         self.vptree = new VPTree()
         self.points = deque[Point]()
 
@@ -95,7 +96,6 @@ cdef class PyVPTree:
                 p = dereference(it2).second
                 p1 = np.array([p.getCoordinate1(),p.getCoordinate2()])
                 d = <float>distance
-                print("The value of p is",p1)
                 result.append(tuple((d,p1)))
                 inc(it2)
             resultList.append(result)
@@ -114,7 +114,6 @@ cdef class PyVPTree:
         point.setCoordinate2(qpoint[1])
         return self.vptree.getAllInRange(point,maxDistance)
 
-        
     def __dealloc__(self):
         if self.vptree != NULL:
             del self.vptree

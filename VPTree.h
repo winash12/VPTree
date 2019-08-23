@@ -40,6 +40,7 @@ class VPTree
   VPTree(){};
   
   void initializeVPTreePoints(std::deque<Point> points);
+  //void initializeDistance(Distance *distFunc);
 
   std::vector<std::pair<double,Point>> getAllInRange(Point query ,double maxDistance);
   std::vector<std::vector<std::pair<double,Point>>> getAllInRange (std::vector<Point> queryPoints,double maxDistance);
