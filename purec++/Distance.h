@@ -28,6 +28,7 @@ class GreatCircleDistance : public Distance
  public:
   GreatCircleDistance(){};
   double calculateDistance(const Point& point1, const Point& point2);
+  double deg2km(double d);
 };
 
 #endif /* DISTANCE_H */

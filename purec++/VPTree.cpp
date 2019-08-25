@@ -5,19 +5,28 @@
 #include <fstream>
 #include <deque>
 #include <list>
+#include <algorithm>
+#include <random>
 #include <boost/optional.hpp>
 #include <boost/range/combine.hpp>
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics.hpp>
 #include <typeinfo>
 #include <memory>
+#include <xtensor/xarray.hpp>
+#include <xtensor/xsort.hpp>
+#include <xtensor/xadapt.hpp>
+#include <xtensor/xmath.hpp>
 #include "VPTree.h"
 
-using namespace std;
-using std::vector;
 using std::deque;
+using namespace boost::accumulators;
 
-void VPTree::initializeDistance(Distance *pfunc)
+
+bool operator!= (Point &lhs,Point &rhs)
 {
-  distance = pfunc;
+  if (lhs != rhs) return true;
+  else return false;
 }
 
 void VPTree::initializeVPTreePoints(deque<Point> points)
@@ -32,8 +41,9 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
   right_max = 0;
 
   time(&start);
-  vp = points.front();
-  points.pop_front();
+  //vp = points.front();
+  vp = _selectVantagePoint(points);
+  //points.pop_front();
 
   if (points.size() == 0)
     {
@@ -47,8 +57,11 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 	{
 	  double d;
 	  Point point = *it;
-	  d = distance->calculateDistance(vp,point);
-	  distances.push_front(d);
+	  if (vp != point)
+	    {
+	      d = distance->calculateDistance(vp,point);
+	      distances.push_back(d);
+	    }
 	}
     }
   catch (const std::out_of_range& oor)
@@ -56,11 +69,11 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
       std::cerr <<"Out of Range error: " << oor.what() << endl;
       exit(0);
     }
-  double median = _findMedian(distances);
+
+  double median = xt::median(xt::adapt(distances));
+  //cout <<"The value of median is " << median << endl;
   time(&end);
-  //double diff = difftime(end,start);
-  //cout << "The value of diff is " << diff << endl;
-  //cout << "The value of median is " << median << endl;
+
   deque<Point> left_points,right_points;
   try
     {
@@ -76,6 +89,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 		{
 		  right_max = dist;
 		  right_points.push_front(point);
+		  
 		}
 	      else
 		{
@@ -84,7 +98,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 	    }
 	  else
 	    {
-	      left_min = min(dist,left_min);
+	      left_min = std::min(dist,left_min);
 	      if (dist > left_max)
 		{
 		  left_max = dist;
@@ -115,10 +129,53 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
       this->right->initializeVPTreePoints(right_points);
     }
 }
+Point VPTree::_selectVantagePoint(deque<Point> points)
+{
+  vector<Point> randomPointsP;
+  vector<Point> randomPointsD;
+  vector<Point>::iterator it;
+  Point bestPoint;
+  double bestSpread = 0;
+  double spread = 0;
+  size_t nelems = points.size()/10;
+  vector<double> distances;
+  // Gets one random selection of Points
+  std::sample(points.begin(),points.end(),std::back_inserter(randomPointsP),
+	      nelems,std::mt19937{std::random_device{}()});
+  for (auto p:randomPointsP)
+    {
+      // Gets another random selection of Points
+      std::sample(points.begin(),points.end(),std::back_inserter(randomPointsD),
+	      nelems,std::mt19937{std::random_device{}()});
+	try
+	  {
+	    for (it = randomPointsD.begin();it != randomPointsD.end();++it)
+	      {
+		double d;
+		Point point = *it;
+		d = distance->calculateDistance(p,point);
+		distances.push_back(d);
+	      }
+	  }
+	catch (const std::out_of_range& oor)
+	  {
+	    std::cerr <<"Out of Range error: " << oor.what() << endl;
+	    exit(0);
+	  }
+	spread = xt::variance(xt::adapt(distances))();
+	if (spread > bestSpread)
+	  {
+	    bestSpread = spread;
+	    bestPoint = p;
+	    break;
+	  }
+    }
+  return bestPoint;
+}
 
 bool VPTree::_isLeaf()
 {
-  if (left == nullptr and right == nullptr)
+  if (!(left)  and !(right))
     {
       return true;
     }
@@ -129,9 +186,8 @@ bool VPTree::_isLeaf()
 }
 
 double VPTree::_findMedian(deque<double>distances) 
-{ 
-  
-  /*size_t size = distances.size();
+{
+  size_t size = distances.size();
   
   if (size == 0)
     {
@@ -140,7 +196,7 @@ double VPTree::_findMedian(deque<double>distances)
   else
     {
   // First we sort the array 
-      qsort(distances.begin(),distances.end()); 
+      sort(distances.begin(),distances.end()); 
       
       if (size % 2 == 0)
 	{
@@ -150,38 +206,59 @@ double VPTree::_findMedian(deque<double>distances)
 	{
 	  return distances[size/2];
 	} 
-	}*/
-  size_t n = distances.size()/2;
-  nth_element(distances.begin(),distances.begin()+n,distances.end());
-  return distances[n];  
+    }
 }
-  
-deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
+
+std::vector<std::vector<std::pair<double,Point>>> VPTree::getAllInRange(std::vector<Point> queryPoints,double maxDistance)
 {
-  deque<pair<double,Point>> neighbors;
+  std::vector<Point>::iterator it;
+
+  std::vector<std::vector<std::pair<double,Point>>> neighborCollection;
+  try
+    {
+      for (it = queryPoints.begin();it != queryPoints.end();++it)
+	{
+	  Point query = *it;
+	  vector<pair<double,Point>> neighbors;
+	  neighbors = getAllInRange(query,maxDistance);
+	  neighborCollection.push_back(neighbors);
+	}
+    }
+  catch(const std::out_of_range& oor)
+    {
+      exit(0);
+    }
+  return neighborCollection;
+}
+
+//NPY_BEGIN_ALLOW_THREADS
+//NPY_END_ALLOW_THREADS
+//Similar to Py_BEGIN_ALLOW_THREADS
+// And Py_END_ALLOW_THREADS
+vector<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
+{
+  vector<pair<double,Point>> neighbors;
   deque<pair<VPTree*,double>> nodes_to_visit;
   VPTree *node;
   double d0;
   nodes_to_visit.push_front(make_pair(this,0));
-  time_t start,end;
-  time(&start);
+
   while (nodes_to_visit.size() > 0 )
     {
       deque<pair<VPTree*,double>>::iterator it = nodes_to_visit.begin();
       node = it->first;
       d0 = it->second;
-      nodes_to_visit.pop_front();
+      nodes_to_visit.erase(it);
       if (node == nullptr or d0 > maxDistance)
 	continue;
       Point point = node->vp;
 
       double dist = distance->calculateDistance(query,point);
-      cout << "vp.getCoordinate1 " << point.getCoordinate1() << endl;
-      cout << "vp.getCoordinate2 " << point.getCoordinate2() << endl;
 
       if (dist < maxDistance)
-	neighbors.push_back(make_pair(dist,point));
-      
+	{
+	  neighbors.push_back(make_pair(dist,point));
+	}
       if (node->_isLeaf())
 	continue;
       if (node->left_min <= dist && dist <= node->left_max)
@@ -210,11 +287,7 @@ deque<pair<double,Point>> VPTree::getAllInRange(Point query, double maxDistance)
 	    dd = dist - node->right_max;
 	  nodes_to_visit.push_back(make_pair(node->right,dd));
 	}
-    }	     
-  time(&end);
-  double diff = difftime(end,start);
-  cout << "The value of diff is " << diff << endl;
-  exit(0);
+    }
   return neighbors;
 }
 
