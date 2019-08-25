@@ -22,6 +22,13 @@
 using std::deque;
 using namespace boost::accumulators;
 
+
+bool operator== (Point &lhs,Point &rhs)
+{
+  if (lhs == rhs) return true;
+  else return false;
+}
+
 void VPTree::initializeVPTreePoints(deque<Point> points)
 {
   time_t start,end;
@@ -34,10 +41,10 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
   right_max = 0;
 
   time(&start);
-  vp = points.front();
-  //vp = _selectVantagePoint(points);
-  points.pop_front();
-
+  //vp = points.front();
+  vp = _selectVantagePoint(points);
+  //points.pop_front();
+  //points.erase(vp);
   if (points.size() == 0)
     {
       return;
@@ -50,8 +57,11 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 	{
 	  double d;
 	  Point point = *it;
-	  d = distance->calculateDistance(vp,point);
-	  distances.push_back(d);
+	  if (!(vp == point))
+	    {
+	      d = distance->calculateDistance(vp,point);
+	      distances.push_back(d);
+	    }
 	}
     }
   catch (const std::out_of_range& oor)
@@ -218,7 +228,6 @@ std::vector<std::vector<std::pair<double,Point>>> VPTree::getAllInRange(std::vec
     {
       exit(0);
     }
-  cout << "The lengt of nc is " << size(neighborCollection) << endl;
   return neighborCollection;
 }
 
