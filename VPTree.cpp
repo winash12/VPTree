@@ -23,9 +23,9 @@ using std::deque;
 using namespace boost::accumulators;
 
 
-bool operator== (Point &lhs,Point &rhs)
+bool operator!= (Point &lhs,Point &rhs)
 {
-  if (lhs == rhs) return true;
+  if (lhs != rhs) return true;
   else return false;
 }
 
@@ -44,7 +44,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
   //vp = points.front();
   vp = _selectVantagePoint(points);
   //points.pop_front();
-  //points.erase(vp);
+
   if (points.size() == 0)
     {
       return;
@@ -57,7 +57,7 @@ void VPTree::initializeVPTreePoints(deque<Point> points)
 	{
 	  double d;
 	  Point point = *it;
-	  if (!(vp == point))
+	  if (vp != point)
 	    {
 	      d = distance->calculateDistance(vp,point);
 	      distances.push_back(d);

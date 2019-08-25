@@ -38,7 +38,7 @@ class VPTree
  public:
 
   VPTree(){};
-  friend bool operator== (Point &lhs,Point &rhs);
+  friend bool operator!= (Point &lhs,Point &rhs);
   void initializeVPTreePoints(std::deque<Point> points);
 
 
