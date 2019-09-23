@@ -1,7 +1,6 @@
 #include <iostream>
 #include "Distance.h"
 
-using namespace std;
 using namespace GeographicLib;
 
 double Distance::calculateDistance(const Point& point1, const Point& point2)
@@ -22,10 +21,11 @@ double GreatCircleDistance::calculateDistance(const Point& point1,const Point& p
   //cout << "The value of lon is " << lon1 << endl;
 
   geod.Inverse(lat1,lon1,lat2,lon2,distance);
-  //cout << "The value of distance is " << distance << endl;
+
   if (!(distance >= 0))
     throw GeographicErr("distance does not satisfy d >= 0");
   distance = deg2km(distance);
+  //cout << "The value of distance is " << distance << endl;
   return distance;
 }
 

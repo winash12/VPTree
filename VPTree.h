@@ -13,7 +13,6 @@
 #include <deque>
 #include "Distance.h"
 
-using namespace std;
 using std::vector;
 using std::deque;
 using std::pair;
