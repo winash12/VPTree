@@ -8,7 +8,7 @@ c) Download https://github.com/QuantStack/xtensor and https://github.com/QuantSt
 
 Build, test and install the above three then type
 
-2) python3.6 setup.py build_ext --inplace
+2) python3.8 setup.py build_ext --inplace
 
 3) This will create a shared library file - vptree.cpython-36m-x86_64-linux-gnu.so
 
