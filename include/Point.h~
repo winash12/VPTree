@@ -1,0 +1,20 @@
+#ifndef POINT_H
+#define POINT_H
+
+/**
+ * Optimized GPM Point
+ * Aligned to 16 bytes so that 'lat' and 'lon' (8 bytes each)
+ * sit perfectly on a single CPU cache line.
+ */
+struct alignas(16) Point {
+    double lat;
+    double lon;
+
+    // Default constructor for the VoxelIndex
+    Point() : lat(0.0), lon(0.0) {}
+
+    // Constructor for the VPTree shared_ptr calls
+    Point(double lt, double ln) : lat(lt), lon(ln) {}
+};
+
+#endif

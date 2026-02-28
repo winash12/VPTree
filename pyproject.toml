@@ -1,0 +1,10 @@
+toml
+[build-system]
+build-backend = 'mesonpy'
+requires = ['meson-python', 'Cython', 'numpy']
+
+[project]
+name = 'gpm_eytzinger_engine'
+version = '0.1'
+description = 'High-performance GPM PR 3D Voxel Interpolation Engine'
+requires-python = '>=3.9'

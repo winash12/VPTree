@@ -1,0 +1,1 @@
+g++ -std=c++17 -O3 -march=native -mavx2 gpm_sorted_engine.hpp  -o gpm_engine
