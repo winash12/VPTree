@@ -23,7 +23,7 @@ Built with the **Meson** build system for maximum efficiency:
 meson setup builddir --buildtype=release
 meson compile -C builddir
 export PYTHONPATH=$PYTHONPATH:$(pwd)/builddir
-Use code with caution.
+
 
 📜 License
 Licensed under the BSD 3-Clause License. See LICENSE for details.
