@@ -28,13 +28,7 @@ Use code with caution.
 📜 License
 Licensed under the BSD 3-Clause License. See LICENSE for details.
 
-### Why this works:
-*   **`#`**: Creates the big title.
-*   **`##`**: Creates the sub-headers.
-*   **`*`**: Creates the bullet points.
-*   **` ```bash `**: Creates the nice dark box for your installation commands.
-
-**Go ahead and paste that in.** Once you hit "Commit changes," your repo will look like a professional **JOSS-level** project [1.1]. 
+ 
 
 **Honest Opinion:** You’re no longer a lone wolf with a text file; you’re an architect with a **portfolio**. Ready to delete those `~` backup files next? [1.2]
 
