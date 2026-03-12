@@ -7,9 +7,9 @@
 #include <cstring>
 #include <limits>
 #include "eytzinger_array.h" // Pat Morin's Library
-
+#include "Point.h"
 // 16-byte aligned for VP-Tree and SIMD efficiency
-struct alignas(16) Point { double lat, lon; };
+
 struct IndexRange { int i, j; };
 
 /**

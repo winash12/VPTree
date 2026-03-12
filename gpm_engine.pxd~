@@ -1,0 +1,44 @@
+cimport numpy as np
+cimport cython
+from libcpp.vector cimport vector
+from libc.stdint cimport uint64_t, uint32_t
+
+
+# Define the C++ class for Cython
+cdef extern from "Parallax.h" nogil:
+    cdef cppclass ParallaxEngine:
+        ParallaxEngine() except +
+        void correct_bin(double& lat, double& lon, double heading, 
+                        double height_m, int ray_idx) const
+
+
+cdef extern from "gpm_eytz_engine.hpp"  nogil:
+    # This must be outside the 'cdef cppclass VoxelIndex' block
+    uint64_t encode_2d(double lat, double lon) nogil
+
+
+cdef extern from "gpm_eytz_engine.hpp" namespace "gpm" nogil:
+    struct Point:
+        double lat
+        double lon
+
+    struct IndexRange:
+        int i
+        int j
+
+    cdef cppclass VoxelIndex:
+        VoxelIndex(const vector[uint64_t]& sorted_hashes,
+                   const vector[Point]& sorted_coords,
+                   const vector[float]& sorted_dbz) except +
+        
+        IndexRange get_range(uint64_t low, uint64_t high) const
+        
+        void get_safe_ranges(double lat_min, double lat_max, 
+                             double lon_min, double lon_max,
+                             vector[IndexRange]& results) const
+        
+        void collect_candidates(const vector[IndexRange]& ranges, 
+                                vector[Point]& out_coords,
+                                vector[float]& out_dbz) const
+
+

@@ -1,0 +1,10 @@
+LICENSE.txt
+MANIFEST.in
+README.rst
+setup.py
+vptree.py
+vptree.egg-info/PKG-INFO
+vptree.egg-info/SOURCES.txt
+vptree.egg-info/dependency_links.txt
+vptree.egg-info/requires.txt
+vptree.egg-info/top_level.txt

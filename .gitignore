@@ -1,0 +1,8 @@
+builddir/
+__pycache__/
+*.so
+*.pyd
+*.pyc
+.venv/
+.mesonpy*
+*.HDF5

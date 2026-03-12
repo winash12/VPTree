@@ -1,0 +1,91 @@
+cimport cython
+import numpy as np
+cimport numpy as np
+from libcpp.vector cimport vector
+from libcpp.pair cimport pair
+from cython.parallel import prange
+from libcpp.memory cimport shared_ptr, make_shared
+# Import the raw-pointer definitions from your .pxd
+from vptree cimport VPTree, Point
+
+
+cdef class PyVPTree:
+    cdef VPTree *vptree
+    cdef Distance *gcd
+    cdef int num_columns
+    cdef int num_procs
+
+    def __cinit__(self, int n_cols, int n_procs=4):
+        self.vptree = new VPTree()
+        self.gcd = NULL # Initialize to NULL for safety
+        self.num_columns = n_cols
+        self.num_procs = n_procs
+
+    def initializeGreatCircleDistance(self):
+        if self.gcd != NULL:
+            del self.gcd
+        # Cast to the base class pointer so VPTree can accept it
+        cdef GreatCircleDistance* g = new GreatCircleDistance()
+        self.gcd = <Distance*>g 
+        self.vptree.initializeDistance(self.gcd)
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    def buildPointsVector(self, double[:] latitude, double[:] longitude):
+        cdef vector[shared_ptr[Point]] pts
+        cdef int i
+        cdef int n = latitude.shape[0]
+
+        pts.reserve(n) # Crucial: prevents re-allocations as the vector grows
+        for i in range(n):
+            # Create the shared_ptr and the Point in one shot
+            # Push it ONCE to the vector
+            pts.push_back(make_shared[Point](latitude[i], longitude[i]))
+        
+        # This triggers the O(N log N) recursive build in C++
+        self.vptree.initializeVPTreePoints(pts)
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    def getNeighborsInRangeParallel(self, double[:, :] gridPoints, double maxDistance):
+        cdef int n = gridPoints.shape[0]
+        cdef int i, j
+        cdef Point p
+        # Pre-allocate C++ storage
+        cdef vector[vector[pair[double, shared_ptr[Point]]]] thread_results
+        thread_results.resize(n)
+
+        with nogil:
+            # schedule='guided' often works better for Karney distances 
+            # because some points converge slower than others.
+            for i in prange(n, schedule='guided', num_threads=self.num_procs):
+                # FIXED: Declaring 'p' here makes it thread-local on the stack.
+                # This ensures no thread overwrites another's coordinates.
+                p.lat = gridPoints[i, 0]
+                p.lon = gridPoints[i, 1]
+                
+                thread_results[i] = self.vptree.getAllInRange(&p, maxDistance)
+
+        # GIL is back: Post-process results
+        final_output = []
+        for i in range(n):
+            point_neighbors = []
+            res_size = thread_results[i].size()
+            for j in range(res_size):
+                dist = thread_results[i][j].first
+                pt_ptr = thread_results[i][j].second.get()
+                
+                # FIXED: Access .lat and .lon directly instead of calling methods
+                point_neighbors.append((
+                    dist, 
+                    (pt_ptr.lat, pt_ptr.lon)
+                ))
+                final_output.append(point_neighbors)
+
+        return final_output
+    
+    def __dealloc__(self):
+        if self.vptree != NULL:
+            del self.vptree
+        if self.gcd != NULL:
+            del self.gcd

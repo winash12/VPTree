@@ -1,0 +1,65 @@
+Metadata-Version: 1.1
+Name: vptree
+Version: 1.1.1
+Summary: A package implementing a vantage-point data structure, for efficient nearest neighbor searching.
+Home-page: https://github.com/RickardSjogren/vptree
+Author: Rickard Sjögren
+Author-email: r.sjogren89@gmail.com
+License: MIT
+Description: VP-Tree
+        =======
+        
+        This package contains an implementation of a `vantage-point tree <https://en.wikipedia.org/wiki/Vantage-point_tree>`_ data structure.
+        
+        Installation
+        ------------
+        
+        Simply install through pip:
+        
+        .. code-block::
+        
+          pip install vptree
+        
+        Example
+        -------
+        
+        Example usage:
+        
+        .. code-block:: python
+        
+          import numpy as np
+          import vptree
+          
+          # Define distance function.
+          def euclidean(p1, p2):
+            return np.sqrt(np.sum(np.power(p2 - p1, 2)))
+          
+          # Generate some random points.
+          points = np.random.randn(20000, 10)
+          query = [.5] * 10
+          
+          # Build tree in O(n log n) time complexity.
+          tree = vptree.VPTree(points, euclidean)   
+          
+          # Query single point.
+          tree.get_nearest_neighbor(query)
+          
+          # Query n-points.
+          tree.get_n_nearest_neighbors(query, 10)
+          
+          # Get all points within certain distance.
+          tree.get_all_in_range(query, 3.14)
+        
+Keywords: python machine learning search
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence

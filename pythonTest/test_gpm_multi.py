@@ -1,0 +1,415 @@
+from functools import partial
+from collections import OrderedDict
+import itertools
+import time
+import math
+import h5py
+from netCDF4 import Dataset
+import scipy
+from scipy.interpolate import RegularGridInterpolator as rgi
+import sys
+import matplotlib.pyplot as pl
+import matplotlib as mpl
+from matplotlib.collections import PatchCollection
+from matplotlib.colors import from_levels_and_colors
+from matplotlib.path import Path
+import matplotlib.patches as patches
+import matplotlib.cm as cm
+import datetime as dt
+from scipy.fftpack import fft
+from scipy.spatial import cKDTree
+from pyproj import Geod
+import numpy as np
+import numpy.ma as npma
+
+
+
+from pyproj import Geod
+
+import vptree
+
+import multiprocessing
+from  multiprocessing import Process,Pool
+
+
+def main():
+
+
+    sr_pars = {"trmm": {
+        "zt": 402500.,  # orbital height of TRMM (post boost)   APPROXIMATION!
+        "dr": 250.,     # gate spacing of TRMM
+    }, "gpm": {
+        "zt": 407000.,  # orbital height of GPM                 APPROXIMATION!
+        "dr": 125.,      # gate spacing of GPM
+    }}
+    
+    bw_sr = 0.71                  # SR beam width
+    platf = "gpm"                 # SR platform/product: one out of ["gpm", "trmm"]
+    zt = sr_pars[platf]["zt"]     # SR orbit height (meters)
+    
+    dr_sr = sr_pars[platf]["dr"]  # SR gate length (meters)
+    
+
+
+    gpm_file = "2A.GPM.Ku.V7-20170308.20180430-S132807-E150039.023692.V05A.HDF5"
+    sr_data = read_gpm(gpm_file)
+    nscan_sr = sr_data['nscan']
+    
+    nray_sr = sr_data['nray']
+    ngate_sr = sr_data['nbin']
+    
+    refl = sr_data['refl']
+#    refl_filled = refl.filled(np.nan)
+
+    reflNZ = refl[np.nonzero(refl)]
+
+    #np.set_printoptions(threshold='nan')
+    sr_lon = sr_data['lon']
+    sr_lat = sr_data['lat']
+
+    #sr_lon = sr_lon[...,np.newaxis]
+    #sr_lat = sr_lat[...,np.newaxis]
+
+    #sr_lon,refl_filled = np.broadcast_arrays(sr_lon,refl_filled)
+    #sr_lat,refl_filled = np.broadcast_arrays(sr_lat,refl_filled)
+    #print(sr_lon.shape,sr_lat.shape)
+    reflp = np.zeros((ngate_sr,nray_sr,nscan_sr))
+    reflC = np.transpose(refl,(2,1,0))
+    reflp[reflC > 0]=1
+    refls = np.sum(reflp,axis=0)
+    sr_latT = sr_lat.T
+    sr_lonT = sr_lon.T
+    print(refls.shape,sr_lonT.shape)
+
+    minLat = sr_latT[refls > 0].min()
+    maxLat = sr_latT[refls > 0].max()
+    minLon = sr_lonT[refls > 0].min()
+    maxLon = sr_lonT[refls > 0].max()
+    print(minLat,maxLat,minLon,maxLon)
+
+    modMinLat = np.mod(minLat,0.05)
+    modMaxLat = np.mod(maxLat,0.05)
+    #print(modMinLat,modMaxLat)
+    minL = minLat - modMinLat
+    maxL = maxLat - modMaxLat
+    modMinLon = np.mod(minLon,0.05)
+    modMaxLon = np.mod(maxLon,0.05)
+    #print(modMinLon,modMaxLon)
+    minLo = minLon - modMinLon
+    maxLo = maxLon - modMaxLon
+    print(minLat,maxLat)
+    print(minLo,maxLo)
+    sys.exit()
+    latGrid = np.arange(minLat,maxLat,0.05)
+    lonGrid = np.arange(minLo,maxLo,0.05)
+    print(latGrid.shape,lonGrid.shape)
+    
+    gridLon,gridLat = np.meshgrid(lonGrid,latGrid)
+    grid_points = np.c_[gridLat.ravel(),gridLon.ravel()]
+
+
+    refl = np.transpose(refl,(2,0,1))
+    args = []
+    args1 = []
+    i = 0
+    t0 = time.time()
+
+    pool = Pool(2)
+
+    t0 = time.time()
+
+    for radar_element in refl:
+        radar_data = radar_element[np.nonzero(radar_element)]
+        lat_surface = sr_lat[np.nonzero(radar_element)]
+        lon_surface = sr_lon[np.nonzero(radar_element)]
+
+        points = np.c_[lat_surface,lon_surface]
+        if points.size > 0:
+            tree = vptree.VPTree(points,greatCircleDistance)
+        sys.exit()
+        for grid_point in grid_points:    
+            indices = tree.get_all_in_range(grid_point,4.3)
+        sys.exit()
+    total = time.time() - t0
+    print(total)
+    sys.exit()
+        #args.append(points)
+        #print("finished" + str(i) + " iteration")
+        #        i +=1
+
+    #indicesColl = np.concatenate(args,axis=0)
+    #pointsColl = np.concatenate(args)
+    sys.exit()
+    
+    pflag = sr_data['pflag']
+
+    
+    # use localZenith Angle
+    alpha = sr_data['zenith']
+    print(alpha.shape)
+
+
+
+    beta = -17.04 + np.arange(nray_sr) * bw_sr
+
+    inverse_distance_interpolation(sr_lon,sr_lat,gridLon,gridLat)
+    #correct_for_parallax(alpha,beta,dr_sr,ngate_sr,sr_lon,sr_lat,refl)
+    sys.exit()
+
+
+def getGridPoints(chunk,tree):
+    args = []
+    for grid_point in (chunk):
+
+        args.append(indices)
+    return args
+
+    
+    
+def greatCircleDistance(point1,point2):
+
+    latitude1,longitude1 = point1
+    latitude2,longitude2 = point2
+    g = Geod(a=180/np.pi,f=0)
+
+    args = g.inv(longitude1,latitude1,longitude2,latitude2,radians=False)
+    distance = args[2]
+    distance = deg2km(distance)
+    #print(distance)
+    return distance
+
+def cressmanWeight(distance,radius):
+    ((math.pow(radius,2))-(math.pow(distance,2)))/((math.pow(radius,2))+(math.pow(distance,2)))
+
+
+
+
+    
+#def cressman_coordinate(dist_sq,values,radius):
+    
+    
+def correct_for_parallax(alpha,beta,drt,nbin,sr_lon,sr_lat,refl):
+
+
+    # create range array from ground to satellite
+    print("beta shape")
+    r_sr_inv = np.arange(nbin) * drt
+
+    r_sr_inv = r_sr_inv/1000
+
+    print("shape of r_sr_inv")
+    
+    center = int(np.floor(len(sr_lon[-1]) / 2.))
+    # calculate arc length
+    arcL = r_sr_inv * np.sin(np.deg2rad(alpha))[..., np.newaxis]
+
+    #z_sr = z_sr[..., np.newaxis]
+    #z_sr = np.transpose(z_sr,(2,0,1))
+
+    # height of each bin
+    z_sr = r_sr_inv * np.cos(np.deg2rad(alpha))[...,np.newaxis]
+    print(z_sr.shape)
+
+    nscans = np.size(refl,0)
+    nrays = np.size(refl,1)
+    nheights = np.size(refl,2)
+
+    #z_sr = np.resize(z_sr,(nscans,nrays,nheights))
+    arcL = m2deg(arcL)
+    print(arcL.shape)
+
+    sr_lon = sr_lon[...,np.newaxis]
+    sr_lat = sr_lat[...,np.newaxis]
+    print(sr_lon.shape,sr_lat.shape)
+    sr_lon = np.transpose(sr_lon,(1,0,2))
+    sr_lat = np.transpose(sr_lat,(1,0,2))
+    arcL,sr_lon = np.broadcast_arrays(arcL,sr_lon)
+    arcL,sr_lat = np.broadcast_arrays(arcL,sr_lat)
+    
+
+    g = Geod(a=180./np.pi,f=0)
+    args = g.inv(sr_lon[:,0],sr_lat[:,0],sr_lon[:,-1],sr_lat[:,-1],radians=False)
+    fwdAz = args[0]
+    bwdAz = args[1]
+    fwdAz = np.resize(fwdAz,(nscans,nrays,nheights))
+
+    # This function call to correct the latitude and longitude given a arc length only
+    # uses the forward azimuth. The g.inv() call gives both the forward azimuth and
+    # backward azimuth. Need to find a way to use the backward azimuth as well.
+    # When I tested the code with backward azimuth no difference were found in the final
+    # longitude and latitudes. Perhaps we can split the data set into using forward
+    # and backward azimuths.
+    args1 = g.fwd(sr_lon[:,:,:],sr_lat[:,:,:],fwdAz[:,:,:],arcL[:,:,:],radians=False)
+    sr_lonC = args1[0]
+    sr_latC = args1[1]
+    print(sr_lonC.shape,sr_latC.shape)
+
+    reflOrig = np.copy(refl)
+    reflNZ = refl[np.nonzero(refl)]
+    #print(len(reflNZ.nonzero()[0]))
+    refl_filled = refl.filled(np.nan)
+
+    sr_lonNZ = sr_lonC[np.nonzero(refl)]
+    sr_latNZ = sr_latC[np.nonzero(refl)]
+    z_srNZ = z_sr[np.nonzero(refl)]    
+
+
+    from mpl_toolkits.mplot3d import Axes3D
+    fig = pl.figure()
+    ax = fig.gca(projection='3d')
+    ax.set_xlabel('Longitude',fontsize=10)
+    ax.set_ylabel('Latitude',fontsize=10)
+    ax.set_zlabel('Altitude',fontsize=10)
+    ax.scatter(sr_lonNZ, sr_latNZ, z_srNZ)
+    pl.show()
+    #pl.savefig('sr.png')
+    return (sr_lon,sr_lat,z_sr)
+
+def km2deg(x):
+    Re = 6371.
+    a=180. * x/(np.pi*Re)
+    return a
+
+def deg2km(x):
+    Re = 6371.
+    km = (x * np.pi * Re)/180.
+    return km
+def read_gpm(filename, bbox=None):
+    """Reads GPM files for matching with GR
+
+    Parameters
+    ----------
+    filename : string
+        path of the GPM file
+    bbox : dict
+        dictionary with bounding box coordinates (lon, lat),
+        defaults to None
+
+    Returns
+    -------
+    gpm_data : dict
+        dictionary of gpm data
+
+    Examples
+    --------
+    See :ref:`/notebooks/match3d/wradlib_match_workflow.ipynb`.
+    """
+    pr_data = Dataset(filename, mode="r")
+    lon = pr_data['NS'].variables['Longitude']
+    lat = pr_data['NS'].variables['Latitude']
+
+    if bbox is not None:
+        poly = [[bbox['left'], bbox['bottom']],
+                [bbox['left'], bbox['top']],
+                [bbox['right'], bbox['top']],
+                [bbox['right'], bbox['bottom']],
+                [bbox['left'], bbox['bottom']]]
+        mask = get_clip_mask(np.dstack((lon[:], lat[:])), poly)
+    else:
+        mask = np.ones_like(lon, dtype=bool, subok=False)
+
+    mask = np.nonzero(np.count_nonzero(mask, axis=1))
+
+    lon = lon[mask]
+    lat = lat[mask]
+
+    year = pr_data['NS']['ScanTime'].variables['Year'][mask]
+    month = pr_data['NS']['ScanTime'].variables['Month'][mask]
+    dayofmonth = pr_data['NS']['ScanTime'].variables['DayOfMonth'][mask]
+    # dayofyear = pr_data['NS']['ScanTime'].variables['DayOfYear'][mask]
+    hour = pr_data['NS']['ScanTime'].variables['Hour'][mask]
+    minute = pr_data['NS']['ScanTime'].variables['Minute'][mask]
+    second = pr_data['NS']['ScanTime'].variables['Second'][mask]
+    # secondofday = pr_data['NS']['ScanTime'].variables['SecondOfDay'][mask]
+    millisecond = pr_data['NS']['ScanTime'].variables['MilliSecond'][mask]
+    date_array = zip(year, month, dayofmonth,
+                     hour, minute, second,
+                     millisecond.astype(np.int32) * 1000)
+    pr_time = np.array(
+        [dt.datetime(d[0], d[1], d[2], d[3], d[4], d[5], d[6]) for d in
+         date_array])
+
+    sfc = pr_data['NS']['PRE'].variables['landSurfaceType'][mask]
+    pflag = pr_data['NS']['PRE'].variables['flagPrecip'][mask]
+
+    # bbflag = pr_data['NS']['CSF'].variables['flagBB'][mask]
+    zbb = pr_data['NS']['CSF'].variables['heightBB'][mask]
+    # print(zbb.dtype)
+    bbwidth = pr_data['NS']['CSF'].variables['widthBB'][mask]
+    qbb = pr_data['NS']['CSF'].variables['qualityBB'][mask]
+    qtype = pr_data['NS']['CSF'].variables['qualityTypePrecip'][mask]
+    ptype = pr_data['NS']['CSF'].variables['typePrecip'][mask]
+
+    quality = pr_data['NS']['scanStatus'].variables['dataQuality'][mask]
+    refl = pr_data['NS']['SLV'].variables['zFactorCorrected'][mask]
+    # print(pr_data['NS']['SLV'].variables['zFactorCorrected'])
+
+    zenith = pr_data['NS']['PRE'].variables['localZenithAngle'][mask]
+
+    pr_data.close()
+
+    # Check for bad data
+    if max(quality) != 0:
+        raise ValueError('GPM contains Bad Data')
+
+    pflag = pflag.astype(np.int8)
+
+    # Determine the dimensions
+    ndim = refl.ndim
+    if ndim != 3:
+        raise ValueError('GPM Dimensions do not match! '
+                         'Needed 3, given {0}'.format(ndim))
+
+    tmp = refl.shape
+    nscan = tmp[0]
+    nray = tmp[1]
+    nbin = tmp[2]
+
+    # Reverse direction along the beam
+    refl = np.flip(refl, axis=-1)
+
+    # Change pflag=1 to pflag=2 to be consistent with 'Rain certain' in TRMM
+    pflag[pflag == 1] = 2
+
+    # Simplify the precipitation types
+    ptype = (ptype / 1e7).astype(np.int16)
+
+    # Simplify the surface types
+    imiss = (sfc == -9999)
+    sfc = (sfc / 1e2).astype(np.int16) + 1
+    sfc[imiss] = 0
+
+    # Set a quality indicator for the BB and precip type data
+    # TODO: Why is the `quality` variable overwritten?
+
+    quality = np.zeros((nscan, nray), dtype=np.uint8)
+
+    i1 = ((qbb == 0) | (qbb == 1)) & (qtype == 1)
+    quality[i1] = 1
+
+    i2 = ((qbb > 1) | (qtype > 2))
+    quality[i2] = 2
+
+    gpm_data = {}
+    gpm_data.update({'nscan': nscan, 'nray': nray, 'nbin': nbin,
+                     'date': pr_time, 'lon': lon, 'lat': lat,
+                     'pflag': pflag, 'ptype': ptype, 'zbb': zbb,
+                     'bbwidth': bbwidth, 'sfc': sfc, 'quality': quality,
+                     'refl': refl, 'zenith': zenith})
+
+    return gpm_data
+
+
+class Coordinate:
+
+    def __init__(self, latitude,longitude):
+        self.latitude = latitude
+        self.longitude = longitude
+        
+    def getLatitude(self):
+        return latitude
+        
+    def getLongitude(self):
+        return longitude
+
+main()

@@ -15,7 +15,7 @@ cdef extern from "Point.h" nogil:
 cdef extern from "Distance.h" nogil:
     cdef cppclass Distance:
         # Note: Match the C++ signature exactly (const Point*)
-        double calculateDistance(const Point* p1, const Point* p2) const
+        double calculate(const Point* p1, const Point* p2) const
 
     cdef cppclass GreatCircleDistance(Distance):
         GreatCircleDistance() except +
