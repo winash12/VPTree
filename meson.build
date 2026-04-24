@@ -19,9 +19,9 @@ numpy_inc_path = run_command(py, [
 
 # --- 3. Source Mapping ---
 sources = [
-  'gpm_engine.pyx',
-  'vptree.pyx',
-  'VPTree.cpp'
+  'cython/gpm_engine.pyx',
+  'cython/vptree.pyx',
+  'src/VPTree.cpp'
 ]
 
 # --- 4. The Extension Module ---

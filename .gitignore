@@ -1,8 +1,14 @@
-builddir/
+# Python
 __pycache__/
+*.pyc
+venv/
+.venv/
+
+# Build System
+builddir/
+.mesonpy/
+
+# Compiled Extensions
 *.so
 *.pyd
-*.pyc
-.venv/
-.mesonpy*
-*.HDF5
+cython/*.cpp

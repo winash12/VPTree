@@ -1,10 +1,18 @@
-toml
-[build-system]
-build-backend = 'mesonpy'
-requires = ['meson-python', 'Cython', 'numpy']
-
 [project]
-name = 'gpm_eytzinger_engine'
-version = '0.1'
-description = 'High-performance GPM PR 3D Voxel Interpolation Engine'
+name = 'Shighra-Prakshepa'
+version = '0.1.0'
+description = 'High-performance GPM PR 3D Voxel Interpolation Engine using Eytzinger Layouts and AVX2'
+readme = "README.md"
 requires-python = '>=3.9'
+license = {text = "MIT"} # Or your chosen license
+authors = [
+    {name = "Your Name", email = "winash12@gmail.com"}
+]
+keywords = ["meteorology", "GPM", "SIMD", "Cython", "radar", "climatology"]
+dependencies = [
+    "numpy>=1.20",
+]
+
+[project.urls]
+Homepage = "https://github.com/winash12/Shighra-Prakshepa"
+Repository = "https://github.com/winash12/Shighra-Prakshepa"

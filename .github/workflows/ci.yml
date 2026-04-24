@@ -1,0 +1,32 @@
+name: CI Build and Test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install System Deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgeographic-dev
+
+      - name: Install Python Deps
+        run: |
+          pip install meson ninja cython numpy pytest
+
+      - name: Build and Install
+        run: |
+          pip install .
+
+      - name: Run Tests
+        run: |
+          pytest tests/
+          
