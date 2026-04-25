@@ -12,3 +12,13 @@ builddir/
 *.so
 *.pyd
 cython/*.cpp
+
+*.egg-info/
+*~
+*.HDF5
+*.h5
+*.RT-H5
+pythonTest/
+__pycache__/
+*.so
+build/
