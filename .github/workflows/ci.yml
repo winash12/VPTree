@@ -2,7 +2,7 @@ name: CI Build and Test
 
 on: [push, pull_request]
 
-# Forces all JavaScript actions to use Node 24 and suppresses the deprecation warning
+# Keeps the environment forced to Node 24 for any background processes
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4.2.2  # Updated from v4.1.7 to support Node 24
+        uses: actions/checkout@v5  # Upgraded to v5 to remove metadata warnings
 
       - name: Set up Python
-        uses: actions/setup-python@v5.3.0  # Updated from v5.2.0 to support Node 24
+        uses: actions/setup-python@v6  # Upgraded to v6 to remove metadata warnings
         with:
           python-version: '3.11'
 
@@ -26,22 +26,14 @@ jobs:
       - name: Install Python Deps
         run: |
           python -m pip install --upgrade pip
-          # We add the scientific stack your legacy test requires
           pip install meson ninja cython numpy pytest scipy h5py netCDF4 wradlib
 
       - name: Build and Install
         run: |
-          # Ensuring the compiler can find the geographiclib headers if needed
           export CPLUS_INCLUDE_PATH=/usr/include/GeographicLib:$CPLUS_INCLUDE_PATH
           pip install .
 
       - name: Run Tests
         run: |
-          # If tests/ is empty, pytest might return an error code. 
-          # This runs it only if the directory exists and has files.
           pytest tests/
-
-
-
-
 
