@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5  # Upgraded to v5 to remove metadata warnings
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v6  # Upgraded to v6 to remove metadata warnings
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
@@ -30,10 +30,11 @@ jobs:
 
       - name: Build and Install
         run: |
-          export CPLUS_INCLUDE_PATH=/usr/include/GeographicLib:$CPLUS_INCLUDE_PATH
+          # Adding both common GeographicLib paths to be safe
+          export CPLUS_INCLUDE_PATH=/usr/include/GeographicLib:/usr/include/geographiclib:$CPLUS_INCLUDE_PATH
           pip install .
 
-     - name: Run Tests
+      - name: Run Tests
         run: |
           # Move into the tests directory so pytest doesn't try 
           # to import from the local source folder
