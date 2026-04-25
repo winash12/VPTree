@@ -2,7 +2,7 @@ name: CI Build and Test
 
 on: [push, pull_request]
 
-# Keeps the environment forced to Node 24 for any background processes
+# Forces the runner to use Node 24 to silence deprecation warnings
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -30,13 +30,12 @@ jobs:
 
       - name: Build and Install
         run: |
-          # Adding both common GeographicLib paths to be safe
+          # Include both possible GeographicLib paths for safety
           export CPLUS_INCLUDE_PATH=/usr/include/GeographicLib:/usr/include/geographiclib:$CPLUS_INCLUDE_PATH
           pip install .
 
       - name: Run Tests
         run: |
-          # Move into the tests directory so pytest doesn't try 
-          # to import from the local source folder
-          cd tests
-          python -m pytest test_gpm_multi.py
+          # The --import-mode flag ensures pytest finds the installed module
+          # rather than looking in the local source folder.
+          python -m pytest tests/ --import-mode=importlib
