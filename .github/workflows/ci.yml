@@ -2,6 +2,10 @@ name: CI Build and Test
 
 on: [push, pull_request]
 
+# Add this to opt-in to Node 24 now and clear the warnings
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
