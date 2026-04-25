@@ -39,4 +39,4 @@ jobs:
           # Move into the tests directory so pytest doesn't try 
           # to import from the local source folder
           cd tests
-          python -m pytest test_legacy.py
+          python -m pytest test_gpm_multi.py
