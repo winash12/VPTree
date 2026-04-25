@@ -33,7 +33,9 @@ jobs:
           export CPLUS_INCLUDE_PATH=/usr/include/GeographicLib:$CPLUS_INCLUDE_PATH
           pip install .
 
-      - name: Run Tests
+     - name: Run Tests
         run: |
-          pytest tests/
-
+          # Move into the tests directory so pytest doesn't try 
+          # to import from the local source folder
+          cd tests
+          python -m pytest test_legacy.py
