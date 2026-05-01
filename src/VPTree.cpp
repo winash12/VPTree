@@ -69,6 +69,12 @@ void VPTree::initializeVPTreePoints(vector<shared_ptr<Point>>& points) {
         right->initializeVPTreePoints(right_points);
     }
 }
+
+// Manually restoring the lost setter for the Legacy Cython engine
+void VPTree::initializeDistance(Distance* d) {
+    this->distance = d; 
+}
+
 double VPTree::_findMedian(vector<double>& distances) const {
     if (distances.empty()) return 0.0;
     size_t n = distances.size() / 2;
