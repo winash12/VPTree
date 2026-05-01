@@ -2,8 +2,6 @@ project('gpm_eytzinger_engine', 'cpp', 'cython',
   version : '0.1',
   default_options : [
     'cpp_std=c++20', 
-    'optimization=3', 
-    'buildtype=release',
     'b_ndebug=if-release'
   ])
 
@@ -27,7 +25,7 @@ omp_dep = dependency('openmp', language: 'cpp')
 geog_dep = dependency('geographiclib') # For ParallaxEngine
 pybind11_dep = dependency('pybind11')
 xtensor_dep = dependency('xtensor')
-xt_py_dep = dependency('xtensor-python')
+xt_py_dep = declare_dependency(include_directories: include_directories('/usr/local/include'))
 
 # --- 4. Build Configuration & Includes ---
 incdir = include_directories('include')
