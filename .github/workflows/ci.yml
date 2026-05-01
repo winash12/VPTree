@@ -55,7 +55,7 @@ jobs:
           
           # 2. Build and install the package
           # Using -v (verbose) is critical here so you can see C++ compiler errors in the CI logs
-          pip install . -v --config-settings=setup-args=""
+          pip install . -v 
 
       - name: Verify Installation
         run: |

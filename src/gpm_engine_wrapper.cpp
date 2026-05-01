@@ -1,6 +1,7 @@
+#define FORCE_IMPORT_ARRAY
+#include <xtensor-python/pyarray.hpp>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <xtensor-python/pyarray.hpp>
 #include <xtensor/views/xview.hpp>
 #include <omp.h>
 #include <cmath>

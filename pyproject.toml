@@ -37,9 +37,8 @@ Homepage = "https://github.com/winash12/Shighra-Prakshepa"
 Repository = "https://github.com/winash12/Shighra-Prakshepa"
 
 [tool.meson-python.args]
-# This ensures that when pip builds the wheel, it uses all available cores
-# and passes the necessary optimization flags.
-setup = ["--buildtype=release"]
+# We remove 'setup' because it conflicts with internal meson-python defaults.
+# '-j0' tells ninja to use all available CPU cores for compilation.
 compile = ["-j0"]
 
 [tool.pytest.ini_options]
