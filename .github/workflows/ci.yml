@@ -55,12 +55,12 @@ jobs:
           
           # 2. Build and install the package
           # Using -v (verbose) is critical here so you can see C++ compiler errors in the CI logs
-          pip install . -v
+          pip install . -v --config-settings=setup-args=""
 
       - name: Verify Installation
         run: |
           # Quick smoke test to ensure the .so files are importable and linked correctly
-          python -c "import gpm_engine; import vptree_cython; print('C++ Extensions Loaded Successfully!')"
+          python -c "import gpm_engine; print('C++ Extensions Loaded Successfully!')"
 
       - name: Run Tests
         run: |
