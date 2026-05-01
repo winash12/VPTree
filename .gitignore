@@ -1,24 +1,46 @@
-# Python
+# Python artifacts
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 venv/
 .venv/
+*.egg-info/
+build/
 
-# Build System
+# Meson & Build System
+# Meson uses 'builddir' by default, but we cover common variations
 builddir/
 .mesonpy/
+_build/
+meson-logs/
 
-# Compiled Extensions
+# Compiled C++/Cython Extensions
+# We want the .pyx and .cpp source, but NOT the final shared objects
 *.so
 *.pyd
-cython/*.cpp
+*.dll
+*.dylib
 
-*.egg-info/
-*~
+# Cython-generated C++ files
+# Meson generates these in builddir, but if you run cython manually, 
+# they appear in the source tree. This keeps the source tree clean.
+cython/*.cpp
+cython/*.c
+
+# Radar/Satellite Data files (Heavy binaries)
 *.HDF5
 *.h5
 *.RT-H5
+*.nc
+*.nc4
+
+# Editor & System leftovers
+*~
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Local Test/Sandbox folders
 pythonTest/
-__pycache__/
-*.so
-build/
