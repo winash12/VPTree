@@ -1,14 +1,33 @@
+[build-system]
+# We need meson-python and ninja to handle the C++20/xtensor build
+# We need cython to handle the legacy vptree_cython logic
+requires = [
+    "meson-python>=0.15.0",
+    "meson>=1.2.0",
+    "ninja",
+    "cython>=3.0.0",
+    "numpy>=2.0",
+    "setuptools>=61.0"
+]
+build-backend = "mesonpy"
+
 [project]
-name = 'Shighra-Prakshepa'
-version = '0.1.0'
-description = 'High-performance GPM PR 3D Voxel Interpolation Engine using Eytzinger Layouts and AVX2'
+name = "Shighra-Prakshepa"
+version = "0.1.0"
+description = "High-performance GPM PR 3D Voxel Interpolation Engine using Eytzinger Layouts and AVX2"
 readme = "README.md"
-requires-python = '>=3.9'
-license = {text = "MIT"} # Or your chosen license
+requires-python = ">=3.9"
+license = {text = "MIT"}
 authors = [
     {name = "Your Name", email = "winash12@gmail.com"}
 ]
-keywords = ["meteorology", "GPM", "SIMD", "Cython", "radar", "climatology"]
+keywords = ["meteorology", "GPM", "SIMD", "Cython", "radar", "climatology", "xtensor", "C++20"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C++",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Intended Audience :: Science/Research"
+]
 dependencies = [
     "numpy>=1.20",
 ]
@@ -16,3 +35,13 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/winash12/Shighra-Prakshepa"
 Repository = "https://github.com/winash12/Shighra-Prakshepa"
+
+[tool.meson-python.args]
+# This ensures that when pip builds the wheel, it uses all available cores
+# and passes the necessary optimization flags.
+setup = ["--buildtype=release"]
+compile = ["-j0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "."]
+python_files = "test_*.py"
