@@ -13,6 +13,8 @@ copyright = f'{datetime.now().year}, Aswin Dinakar'
 author = 'Aswin Dinakar'
 release = '1.0'
 
+autodoc_mock_imports = ["gpm_engine", "numpy", "geographiclib"]
+
 # --- General configuration ---
 extensions = [
     'sphinx.ext.autodoc',     # For the Cython/Python bridge
