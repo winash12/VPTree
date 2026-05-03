@@ -44,3 +44,7 @@ cython/*.c
 
 # Local Test/Sandbox folders
 pythonTest/
+
+# Sphinx build artifacts
+docs/build/
+docs/_build/
