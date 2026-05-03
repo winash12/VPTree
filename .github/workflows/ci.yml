@@ -38,8 +38,17 @@ jobs:
       - name: Install xtensor-python (Header-only)
         run: |
           # xtensor-python is usually not in apt; we fetch the headers manually
+          # 1. Install xtl (Core dependency)        
+          git clone --depth 1 https://github.com/xtensor-stack/xtl.git
+          sudo cp -r xtl/include/xtl /usr/local/include/
+
+          # 2. Install base xtensor
+          git clone --depth 1 https://github.com/xtensor-stack/xtensor.git
+          sudo cp -r xtensor/include/xtensor /usr/local/include/
+          
+          # 3. Install xtensor-python
           git clone --depth 1 https://github.com/xtensor-stack/xtensor-python.git
-          sudo cp -r xtensor-python/include/* /usr/local/include/
+          sudo cp -r xtensor-python/include/xtensor-python /usr/local/include/
           
       - name: Install Python Dependencies
         run: |
