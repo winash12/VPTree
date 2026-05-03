@@ -11,26 +11,37 @@ py = py_mod.find_installation(pure: false)
 py_dep = py.dependency()
 
 # --- 2. NumPy Detection ---
+# We bypass include_directories() because Meson blocks absolute paths 
+# pointing inside the source tree (which happens when using a .venv).
 numpy_inc_path = run_command(py, [
   '-c', 'import numpy; print(numpy.get_include())'
 ], check: true).stdout().strip()
 
-numpy_dep = declare_dependency(include_directories: include_directories(numpy_inc_path))
+# Add the path directly to project arguments so Meson doesn't check it
+add_project_arguments('-I' + numpy_inc_path, language: 'cpp')
+
+# Create an empty dependency so the rest of the script remains valid
+numpy_dep = declare_dependency()
+
 
 # --- 3. Core Dependencies ---
 omp_dep = dependency('openmp', language: 'cpp')
 geog_dep = dependency('geographiclib') 
 pybind11_dep = dependency('pybind11')
 
-# Manual include path for xtensor, xtl, and xtensor-python headers cloned in CI
-xtensor_inc = include_directories('/usr/local/include')
-xtensor_dep = declare_dependency(include_directories: xtensor_inc)
-xt_py_dep = declare_dependency(include_directories: xtensor_inc)
+# FIX: We pass the absolute system path directly to the compiler args.
+# This avoids the "Absolute path to a dir in the source tree" error.
+add_project_arguments('-I/usr/local/include', language: 'cpp')
+
+# We declare these as empty dependencies so the extension_module logic stays clean.
+xtensor_dep = declare_dependency()
+xt_py_dep = declare_dependency()
 
 # --- 4. Build Configuration & Includes ---
+# This uses a relative path, which Meson allows.
 incdir = include_directories('include')
 
-# Optimization flags
+# Optimization flags for AVX2 and speed
 common_cpp_args = [
   '-march=native',   
   '-mavx2',          
